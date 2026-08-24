@@ -161,6 +161,13 @@ body{background:linear-gradient(180deg,#07110f 0%,#091713 55%,#07110f 100%);colo
 }
 
 
+
+/* 2026-08-25: Home maximum-catch cards use Instagram portrait ratio (4:5).
+   Width/grid/visual styling unchanged; home auto-fit remains responsible for calendar height. */
+#home .maxCard{height:auto;aspect-ratio:4/5}
+@media(max-height:820px){#home .maxCard{height:auto;aspect-ratio:4/5}}
+@media(max-height:700px){#home .maxCard{height:auto;aspect-ratio:4/5}}
+
 </style>
 </head><body>
 <div class="wrap">
