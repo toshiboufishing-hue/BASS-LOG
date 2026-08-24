@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Bass Log v10.4</title>
+<title>Bass Log v10.5</title>
 <style>
 :root{--bg:#eef3f0;--card:#fff;--ink:#14201c;--muted:#64726c;--a:#153f34;--a2:#2c705b;--line:#d7e2dc;--danger:#a43e42;--glass:rgba(7,20,16,.58)}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -63,7 +63,7 @@ body{min-height:100dvh}.wrap{padding-bottom:calc(78px + env(safe-area-inset-bott
 </style>
 </head><body>
 <div class="wrap">
-<div class="brand"><div><h1>🎣 Bass Log <small style='font-size:11px'>v10.4</small></h1><div class="muted">釣行を、もっと簡単に残す。</div></div><div class="muted">OFFLINE FIRST</div></div>
+<div class="brand"><div><h1>🎣 Bass Log <small style='font-size:11px'>v10.5</small></h1><div class="muted">釣行を、もっと簡単に残す。</div></div><div class="muted">OFFLINE FIRST</div></div>
 
 
 <button id="installAppBtn" class="btn pri" style="display:none;width:100%;margin:10px 0">
@@ -163,6 +163,86 @@ Chromeのメニューから「アプリをインストール」でも追加で�
 <script>
 const $=id=>document.getElementById(id);
 const RKEY='basslog_records_v2', TKEY='basslog_tackle_v6', TRIPKEY='basslog_active_trip_v1', HOMEKEY='basslog_home_v1';
+const MEDIA_DB='basslog_media_v1', MEDIA_STORE='catch_media';
+let mediaDBPromise=null;
+function openMediaDB(){
+  if(mediaDBPromise)return mediaDBPromise;
+  mediaDBPromise=new Promise((resolve,reject)=>{
+    const req=indexedDB.open(MEDIA_DB,1);
+    req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(MEDIA_STORE))db.createObjectStore(MEDIA_STORE,{keyPath:'key'})};
+    req.onsuccess=()=>resolve(req.result);
+    req.onerror=()=>reject(req.error||new Error('IndexedDBを開けません'));
+  });
+  return mediaDBPromise;
+}
+async function mediaPut(key,photos,cover){
+  const db=await openMediaDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(MEDIA_STORE,'readwrite');
+    tx.objectStore(MEDIA_STORE).put({key,photos:[...(photos||[])],coverIndex:Number.isInteger(cover)?cover:0,updatedAt:Date.now()});
+    tx.oncomplete=()=>resolve(true);
+    tx.onerror=()=>reject(tx.error||new Error('写真保存に失敗'));
+    tx.onabort=()=>reject(tx.error||new Error('写真保存が中断されました'));
+  });
+}
+async function mediaGet(key){
+  if(!key)return null;
+  const db=await openMediaDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(MEDIA_STORE,'readonly'),req=tx.objectStore(MEDIA_STORE).get(key);
+    req.onsuccess=()=>resolve(req.result||null);
+    req.onerror=()=>reject(req.error||new Error('写真読込に失敗'));
+  });
+}
+async function mediaDelete(key){
+  if(!key)return;
+  const db=await openMediaDB();
+  return new Promise((resolve,reject)=>{
+    const tx=db.transaction(MEDIA_STORE,'readwrite');
+    tx.objectStore(MEDIA_STORE).delete(key);
+    tx.oncomplete=()=>resolve();
+    tx.onerror=()=>reject(tx.error);
+  });
+}
+function makeThumbData(dataUrl){
+  if(!dataUrl)return Promise.resolve('');
+  return new Promise(resolve=>{
+    const im=new Image();
+    im.onload=()=>{
+      const max=280,sc=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');
+      c.width=Math.max(1,Math.round(im.width*sc));c.height=Math.max(1,Math.round(im.height*sc));
+      c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+      resolve(c.toDataURL('image/jpeg',.58));
+    };
+    im.onerror=()=>resolve('');
+    im.src=dataUrl;
+  });
+}
+async function migrateLegacyMedia(){
+  const all=getR();
+  let changed=false,migrated=[];
+  try{
+    for(const old of all){
+      const legacy=Array.isArray(old.photos)&&old.photos.length?[...old.photos]:(old.photo?[old.photo]:[]);
+      if(!legacy.length){migrated.push(old);continue}
+      const cover=Number.isInteger(old.coverIndex)?Math.min(old.coverIndex,legacy.length-1):0;
+      const key=old.mediaKey||`legacy_${old.id}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+      await mediaPut(key,legacy,cover);
+      const thumb=old.thumb||await makeThumbData(legacy[cover]||legacy[0]);
+      const n={...old,mediaKey:key,coverIndex:cover,thumb};
+      delete n.photo;delete n.photos;
+      migrated.push(n);changed=true;
+    }
+    if(changed)setR(migrated);
+    if(navigator.storage?.persist)navigator.storage.persist().catch(()=>{});
+    return true;
+  }catch(err){
+    console.error('legacy media migration',err);
+    alert('写真データの移行に失敗しました。既存データは削除していません。\n'+(err?.message||err));
+    return false;
+  }
+}
+
 let cur=new Date(), selectedDate='', photoData='', photoList=[], photoMeta=[], coverIndex=0, measurePts=[], measured=null, currentSNSDate='', selectedSNSCatch=null;
 let editingCatchId=null, selectedCatchId=null;
 let entryDraft=null, returningFromMeasure=false;
@@ -216,14 +296,23 @@ function exifDateFromFile(file){if(!file||!/jpe?g/i.test(file.type||file.name||'
 function imageToSafeData(file,cb){if(!file)return;let rd=new FileReader();rd.onload=()=>{let im=new Image();im.onload=()=>{let sc=Math.min(1,1800/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*sc);c.height=Math.round(im.height*sc);c.getContext('2d').drawImage(im,0,0,c.width,c.height);cb(c.toDataURL('image/jpeg',.88))};im.src=rd.result};rd.readAsDataURL(file)}
 function applyEarliestPhotoTime(){let a=photoMeta.filter(Boolean).sort((x,y)=>x.stamp.localeCompare(y.stamp));if(a.length){setValIf('date',a[0].date);setValIf('catchTime',a[0].time)}}
 
-function catchPhoto(r){if(Array.isArray(r?.photos)&&r.photos.length){let i=Number.isInteger(r.coverIndex)?r.coverIndex:0;return r.photos[i]||r.photos[0]}return r?.photo||''}
+function catchPhoto(r){if(r?.thumb)return r.thumb;if(Array.isArray(r?.photos)&&r.photos.length){let i=Number.isInteger(r.coverIndex)?r.coverIndex:0;return r.photos[i]||r.photos[0]}return r?.photo||''}
 function maxCatch(list){return list.filter(r=>Number.isFinite(Number(r.size))).sort((a,b)=>Number(b.size)-Number(a.size))[0]||null}
 function maxCardHTML(label,r){let img=catchPhoto(r);return `${img?`<img src="${img}">`:''}<div class="maxCardText"><div class="maxCardLabel">${label}</div><div class="maxCardSize">${r?esc(r.size)+' cm':'-- cm'}</div><div class="maxCardMeta">${r?esc(r.date)+' / '+esc(r.publicPlace||r.place||''): 'まだ記録なし'}</div></div>`}
 function renderHome(){let all=getR(),now=new Date(),y=now.getFullYear(),mo=now.getMonth(),month=all.filter(r=>{let d=new Date(r.date+'T00:00:00');return d.getFullYear()===y&&d.getMonth()===mo}),year=all.filter(r=>new Date(r.date+'T00:00:00').getFullYear()===y);$('maxMonth').innerHTML=maxCardHTML('今月最大',maxCatch(month));$('maxYear').innerHTML=maxCardHTML('今年最大',maxCatch(year));$('maxAll').innerHTML=maxCardHTML('歴代最大',maxCatch(all));renderCalendar();let trip=getTrip();if(trip){$('tripBanner').style.display='block';$('tripBanner').innerHTML=`<b>🚤 今日の釣行：${esc(trip.publicPlace)}</b><div class="muted">${esc(trip.date)} / ${esc(trip.ride||'')}</div><div class="tripTackles">${(trip.setNames||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>`}else $('tripBanner').style.display='none'}
 function renderHero(){}
 function renderCalendar(){let y=cur.getFullYear(),m=cur.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),all=getR(),today=new Date();$('mt').textContent=`${y}年 ${m+1}月`;let h='';for(let i=0;i<first;i++)h+='<div class="day empty"></div>';for(let d=1;d<=days;d++){let ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,a=all.filter(x=>x.date===ds),p=catchPhoto(a.find(x=>catchPhoto(x))),td=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;h+=`<button class="day ${a.length?'has':''} ${td?'today':''}" data-date="${ds}"><div class="num">${d}</div>${a.length?`<div class="cnt">🎣 ${a.length}本</div>${p?`<img class="mini" src="${p}">`:''}`:''}</button>`}$('cal').innerHTML=h;document.querySelectorAll('.day[data-date]').forEach(b=>b.onclick=()=>openDay(b.dataset.date))}
 function openDay(date){selectedDate=date;let a=getR().filter(x=>x.date===date);$('dt').textContent=date.replaceAll('-','/');let pub=a[0]?.publicPlace||a[0]?.place||'-';$('daySummary').innerHTML=`<b>📍 ${esc(pub)}</b><div class="muted">${a.length}本 / 最大 ${a.map(x=>x.size).filter(Number.isFinite).length?Math.max(...a.map(x=>x.size).filter(Number.isFinite))+'cm':'-'}</div>`;$('gal').innerHTML=a.length?a.map(x=>`<button class="g" data-id="${x.id}">${catchPhoto(x)?`<img src="${catchPhoto(x)}">`:`<div class="ph">🎣</div>`}<div class="cap"><b>${x.size?x.size+'cm':'サイズ未入力'}</b><div class="muted">${esc(x.lure||'')}</div></div></button>`).join(''):'<div class="card">この日の釣果はありません</div>';document.querySelectorAll('.g').forEach(b=>b.onclick=()=>openDetail(+b.dataset.id));show('day')}
-function openDetail(id){selectedCatchId=id;let x=getR().find(r=>r.id===id);if(!x)return;let tempDiff=(x.airTemp!=null&&x.waterTemp!=null)?(Number(x.waterTemp)-Number(x.airTemp)).toFixed(1)+'℃':'';let rows=[['日付',x.date],['時間',x.catchTime],['公開場所',x.publicPlace||x.place],['自分用場所',x.privatePlace||x.place],['サイズ',x.size?x.size+'cm':''],['天気',x.weather],['風向',x.windDir],['風速',x.windSpeed!==''&&x.windSpeed!=null?x.windSpeed+'m/s':''],['乗り物',x.ride],['水温',x.waterTemp!=null?x.waterTemp+'℃':''],['気温',x.airTemp!=null?x.airTemp+'℃':''],['水温−気温',tempDiff],['ロッド',x.rod||x.tackle],['リール',x.reel],['ライン',lineText(x.lineType,x.lineLb)],['ルアー',x.lure],['カラー',x.color],['リグ',x.rig],['シンカー',x.sinkerWeight],['レンジ',x.range],['釣り方',x.method],['状況',x.situation]].filter(r=>r[1]);$('detailBox').innerHTML=`<div class="card">${(Array.isArray(x.photos)&&x.photos.length)?`<div class="detailPhotos">${x.photos.map(p=>`<img src="${p}">`).join('')}</div>`:(x.photo?`<img class="detailPhoto" src="${x.photo}">`:'')}<div class="rows">${rows.map(r=>`<div>${esc(r[0])}</div><div>${esc(r[1])}</div>`).join('')}</div></div>`;show('detail')}
+async function openDetail(id){
+  selectedCatchId=id;
+  let x=getR().find(r=>r.id===id);if(!x)return;
+  let media=null;try{media=await mediaGet(x.mediaKey)}catch(e){console.warn(e)}
+  let pics=media?.photos?.length?media.photos:(Array.isArray(x.photos)&&x.photos.length?x.photos:(x.photo?[x.photo]:[]));
+  let tempDiff=(x.airTemp!=null&&x.waterTemp!=null)?(Number(x.waterTemp)-Number(x.airTemp)).toFixed(1)+'℃':'';
+  let rows=[['日付',x.date],['時間',x.catchTime],['公開場所',x.publicPlace||x.place],['自分用場所',x.privatePlace||x.place],['サイズ',x.size?x.size+'cm':''],['天気',x.weather],['風向',x.windDir],['風速',x.windSpeed!==''&&x.windSpeed!=null?x.windSpeed+'m/s':''],['乗り物',x.ride],['水温',x.waterTemp!=null?x.waterTemp+'℃':''],['気温',x.airTemp!=null?x.airTemp+'℃':''],['水温−気温',tempDiff],['ロッド',x.rod||x.tackle],['リール',x.reel],['ライン',lineText(x.lineType,x.lineLb)],['ルアー',x.lure],['カラー',x.color],['リグ',x.rig],['シンカー',x.sinkerWeight],['レンジ',x.range],['釣り方',x.method],['状況',x.situation]].filter(r=>r[1]);
+  $('detailBox').innerHTML=`<div class="card">${pics.length?`<div class="detailPhotos">${pics.map(p=>`<img src="${p}">`).join('')}</div>`:''}<div class="rows">${rows.map(r=>`<div>${esc(r[0])}</div><div>${esc(r[1])}</div>`).join('')}</div></div>`;
+  show('detail');
+}
 $('backCal').onclick=()=>show('home');$('backDay').onclick=()=>openDay(selectedDate);
 
 function renderTrip(){let t=getT(),trip=getTrip();$('tripDate').value=trip?.date||new Date().toISOString().slice(0,10);$('publicPlace').value=trip?.publicPlace||'高滝湖';$('privatePlace').value=trip?.privatePlace||'';$('tripRide').value=trip?.ride||'フローター';$('todaySetList').innerHTML=t.sets.length?t.sets.map((s,i)=>`<label class="checkrow"><input type="checkbox" class="todaySet" value="${i}" ${(trip?.setIndexes||[]).includes(i)?'checked':''}><span><b>${esc(s.name)}</b><br><span class="muted">${esc(s.rod)} / ${esc(s.reel)} / ${esc(s.type)} ${s.lb}lb</span></span></label>`).join(''):'<div class="note">先に「タックル」でセットを登録してね。</div>'}
@@ -252,7 +341,7 @@ function restoreEntryDraft(d){
   editingCatchId=d.editingCatchId??editingCatchId;
 }
 
-function fillEntryFromCatch(x){
+async function fillEntryFromCatch(x){
   editingCatchId=x.id;
   $('editBanner').style.display='block';$('cancelEdit').style.display='inline-block';
   $('entryTripInfo').style.display='none';
@@ -261,7 +350,9 @@ function fillEntryFromCatch(x){
   setValIf('weather',x.weather||'');setValIf('windDir',x.windDir||'');setValIf('windSpeed',x.windSpeed??'');setValIf('ride',x.ride||'');
   setValIf('rod',x.rod||x.tackle||'');setValIf('reel',x.reel||'');setValIf('lineType',x.lineType||'');fillLineSize(x.lineType||'','lineLb','lineSizeLabel',x.lineLb??'');setValIf('lure',x.lure||'');setValIf('color',x.color||'');setValIf('rig',x.rig||'');setValIf('sinkerWeight',x.sinkerWeight||'');
   setValIf('range',x.range||'');setValIf('method',x.method||'');setValIf('situation',x.situation||'');
-  photoList=Array.isArray(x.photos)&&x.photos.length?[...x.photos]:(x.photo?[x.photo]:[]);photoMeta=photoList.map(()=>null);coverIndex=Number.isInteger(x.coverIndex)?x.coverIndex:0;photoData=photoList[coverIndex]||photoList[0]||'';syncMainPhoto();
+  let media=null;try{media=await mediaGet(x.mediaKey)}catch(e){console.warn(e)}
+  photoList=media?.photos?.length?[...media.photos]:(Array.isArray(x.photos)&&x.photos.length?[...x.photos]:(x.photo?[x.photo]:[]));
+  photoMeta=photoList.map(()=>null);coverIndex=Number.isInteger(x.coverIndex)?Math.min(x.coverIndex,Math.max(0,photoList.length-1)):0;photoData=photoList[coverIndex]||photoList[0]||'';syncMainPhoto();
   $('saveCatch').textContent='変更を保存';
 }
 function leaveEditMode(){
@@ -273,10 +364,10 @@ $('editCatch').onclick=()=>{
   show('entry');setTimeout(()=>fillEntryFromCatch(x),0);
 };
 $('cancelEdit').onclick=()=>{let id=editingCatchId;leaveEditMode();photoData='';if(id)openDetail(id);else show('home')};
-$('deleteCatch').onclick=()=>{
+$('deleteCatch').onclick=async()=>{
   let x=getR().find(r=>r.id===selectedCatchId);if(!x)return;
   if(!confirm(`${x.date} / ${x.size?x.size+'cm':'サイズ未入力'} の釣果を削除する？\\nこの操作は元に戻せません。`))return;
-  let a=getR().filter(r=>r.id!==selectedCatchId);setR(a);let d=selectedDate||x.date;selectedCatchId=null;alert('削除しました');openDay(d);
+  let a=getR().filter(r=>r.id!==selectedCatchId);setR(a);try{await mediaDelete(x.mediaKey)}catch(e){console.warn(e)}let d=selectedDate||x.date;selectedCatchId=null;alert('削除しました');openDay(d);
 };
 $('tackleSet').onchange=()=>{let i=$('tackleSet').value;if(i==='')return;let s=getT().sets[+i];$('rod').value=s.rod;$('reel').value=s.reel;$('lineType').value=s.type;fillLineSize(s.type,'lineLb','lineSizeLabel',s.lb)};
 function syncMainPhoto(){if(coverIndex>=photoList.length)coverIndex=0;photoData=photoList[coverIndex]||photoList[0]||'';$('preview').style.display='none';renderPhotoGrid()}
@@ -288,7 +379,8 @@ $('lineType').onchange=()=>fillLineSize($('lineType').value,'lineLb','lineSizeLa
 $('newSetLineType').onchange=()=>fillLineSize($('newSetLineType').value,'newSetLb','newSetSizeLabel','');
 fillLineSize($('lineType').value,'lineLb','lineSizeLabel',$('lineLb').value);
 fillLineSize($('newSetLineType').value,'newSetLb','newSetSizeLabel',$('newSetLb').value);
-$('saveCatch').onclick=()=>{
+$('saveCatch').onclick=async()=>{
+ let newMediaKey='';
  try{
    const publicPlace=valOf('entryPublicPlace',valOf('place',''));
    const privatePlace=valOf('place','').trim();
@@ -304,8 +396,9 @@ $('saveCatch').onclick=()=>{
      windSpeed:valOf('windSpeed',''),
      ride:valOf('ride',''),
      waterTemp:numOf('waterTemp'),airTemp:numOf('airTemp'),
-     photo:photoList[coverIndex]||photoList[0]||photoData||'',coverIndex:photoList.length?coverIndex:0,
-     photos:photoList.length?[...photoList]:(photoData?[photoData]:[]),
+     coverIndex:photoList.length?coverIndex:0,
+     mediaKey:'',
+     thumb:'',
      rod:valOf('rod',valOf('tackle','')),
      reel:valOf('reel',''),
      lineType:valOf('lineType',''),
@@ -316,9 +409,20 @@ $('saveCatch').onclick=()=>{
      range:valOf('range','').trim(),
      method:valOf('method','').trim(),
      situation:valOf('situation','').trim()
-   };
-   if(!x.date){alert('日付を入れてね');return}
+   };   if(!x.date){alert('日付を入れてね');return}
    let a=getR(),wasEdit=!!editingCatchId;
+   let oldRecord=wasEdit?a.find(r=>r.id===editingCatchId):null;
+   let oldMediaKey=oldRecord?.mediaKey||'';
+   let pics=photoList.length?[...photoList]:(photoData?[photoData]:[]);
+   newMediaKey=`media_${x.id}_${Date.now()}_${Math.random().toString(36).slice(2,7)}`;
+   if(pics.length){
+     await mediaPut(newMediaKey,pics,x.coverIndex);
+     x.mediaKey=newMediaKey;
+     x.thumb=await makeThumbData(pics[x.coverIndex]||pics[0]);
+   }else{
+     x.mediaKey='';
+     x.thumb='';
+   }
    if(wasEdit){
      let i=a.findIndex(r=>r.id===editingCatchId);
      if(i<0){alert('編集元の釣果が見つかりません');return}
@@ -332,6 +436,7 @@ $('saveCatch').onclick=()=>{
    // Verify persistence immediately.
    let verify=getR().find(r=>r.id===x.id);
    if(!verify){throw new Error('保存後の確認に失敗')}
+   if(oldMediaKey&&oldMediaKey!==x.mediaKey){try{await mediaDelete(oldMediaKey)}catch(e){console.warn(e)}}
    let savedId=x.id;
    leaveEditMode();
    entryDraft=null;
@@ -561,7 +666,7 @@ function rotatePhoto90(direction){
     ctx.translate(c.width/2,c.height/2);
     ctx.rotate(direction*Math.PI/2);
     ctx.drawImage(srcImg,-srcImg.width/2,-srcImg.height/2);
-    photoData=c.toDataURL('image/jpeg',.88);if(photoList.length)photoList[0]=photoData;else photoList=[photoData];
+    photoData=c.toDataURL('image/jpeg',.88);if(photoList.length)photoList[coverIndex]=photoData;else{photoList=[photoData];photoMeta=[null];coverIndex=0};
 
     $('preview').src=photoData;
     $('preview').style.display='block';
@@ -693,19 +798,29 @@ function reelModelsSorted(m){return (REEL_DB[m]||[]).slice().sort((a,b)=>Number(
 function refreshReelGears(){let m=$('reelMaker').value,i=$('reelModel').value,x=reelModelsSorted(m)[+i];$('reelGear').innerHTML='<option value="">ギヤ比を選択</option>'+(x?x[2].map(g=>`<option>${g}</option>`).join(''):'')}
 $('reelMaker').onchange=refreshReelModels;$('reelModel').onchange=refreshReelGears;
 $('addReelCatalog').onclick=()=>{let m=$('reelMaker').value,i=$('reelModel').value,g=$('reelGear').value,h=$('reelHand').value;if(!m||i===''||!g){alert('メーカー・モデル・ギヤ比を選択してね');return}let x=reelModelsSorted(m)[+i],v=`${m} ${x[0]} ${x[1]} ${g}:1${h?' '+h:''}`,t=getT();if(!t.reels.includes(v))t.reels.push(v);setT(t);renderTackle()};
-function renderTackle(){let t=getT(),row=(x,i,c)=>`<div class="regItem"><span>${esc(x)}</span><button class="btn danger ${c}" data-i="${i}">削除</button></div>`;$('rodList').innerHTML=t.rods.map((x,i)=>row(x,i,'delRod')).join('')||'<div class="note">未登録</div>';$('reelList').innerHTML=t.reels.map((x,i)=>row(x,i,'delReel')).join('')||'<div class="note">未登録</div>';$('newSetRod').innerHTML=t.rods.map(x=>`<option>${esc(x)}</option>`).join('');$('newSetReel').innerHTML=t.reels.map(x=>`<option>${esc(x)}</option>`).join('');$('setList').innerHTML=t.sets.map((x,i)=>`<div class="tackleSet"><b>${esc(x.name)}</b><div class="muted">${esc(x.rod)} / ${esc(x.reel)} / ${esc(x.type)} ${x.lb}lb</div><button class="btn danger delSet" data-i="${i}" style="margin-top:7px">削除</button></div>`).join('')||'<div class="note">未登録</div>';document.querySelectorAll('.delRod').forEach(b=>b.onclick=()=>{let t=getT();t.rods.splice(+b.dataset.i,1);setT(t);renderTackle()});document.querySelectorAll('.delReel').forEach(b=>b.onclick=()=>{let t=getT();t.reels.splice(+b.dataset.i,1);setT(t);renderTackle()});document.querySelectorAll('.delSet').forEach(b=>b.onclick=()=>{let t=getT();t.sets.splice(+b.dataset.i,1);setT(t);renderTackle()})}
+function renderTackle(){let t=getT(),row=(x,i,c)=>`<div class="regItem"><span>${esc(x)}</span><button class="btn danger ${c}" data-i="${i}">削除</button></div>`;$('rodList').innerHTML=t.rods.map((x,i)=>row(x,i,'delRod')).join('')||'<div class="note">未登録</div>';$('reelList').innerHTML=t.reels.map((x,i)=>row(x,i,'delReel')).join('')||'<div class="note">未登録</div>';$('newSetRod').innerHTML=t.rods.map(x=>`<option>${esc(x)}</option>`).join('');$('newSetReel').innerHTML=t.reels.map(x=>`<option>${esc(x)}</option>`).join('');$('setList').innerHTML=t.sets.map((x,i)=>`<div class="tackleSet"><b>${esc(x.name)}</b><div class="muted">${esc(x.rod)} / ${esc(x.reel)} / ${esc(x.type)} ${x.lb}${lineUnit(x.type)}</div><button class="btn danger delSet" data-i="${i}" style="margin-top:7px">削除</button></div>`).join('')||'<div class="note">未登録</div>';document.querySelectorAll('.delRod').forEach(b=>b.onclick=()=>{let t=getT();t.rods.splice(+b.dataset.i,1);setT(t);renderTackle()});document.querySelectorAll('.delReel').forEach(b=>b.onclick=()=>{let t=getT();t.reels.splice(+b.dataset.i,1);setT(t);renderTackle()});document.querySelectorAll('.delSet').forEach(b=>b.onclick=()=>{let t=getT();t.sets.splice(+b.dataset.i,1);setT(t);renderTackle()})}
 $('addRod').onclick=()=>{let v=$('newRod').value.trim();if(!v)return;let t=getT();if(!t.rods.includes(v))t.rods.push(v);setT(t);$('newRod').value='';renderTackle()};$('addReel').onclick=()=>{let v=$('newReel').value.trim();if(!v)return;let t=getT();if(!t.reels.includes(v))t.reels.push(v);setT(t);$('newReel').value='';renderTackle()};$('addSet').onclick=()=>{let n=$('newSetName').value.trim(),lb=parseFloat($('newSetLb').value);if(!n||!$('newSetRod').value||!$('newSetReel').value||!lb){alert('セット内容を入力してね');return}let t=getT();t.sets.push({name:n,rod:$('newSetRod').value,reel:$('newSetReel').value,type:$('newSetLineType').value,lb});setT(t);$('newSetName').value='';$('newSetLb').value='';renderTackle()};
 
 $('daySNS').onclick=()=>openSNS(selectedDate);$('backSNS').onclick=()=>openDay(currentSNSDate);function openSNS(date){currentSNSDate=date;let a=getR().filter(x=>x.date===date);if(!a.length)return;let pub=a[0].publicPlace||'非公開';let safe=['野池','溜池','非公開'].includes(pub);$('snsPrivacy').innerHTML=`<strong>公開場所：${esc(pub)}</strong><br>${safe?'詳細場所は投稿素材に含めません。':'自分用の詳細場所は投稿素材に含めません。'}`;let sizes=a.map(x=>x.size).filter(Number.isFinite),lines=[`${date.replaceAll('-','/')} ${pub} 🎣`,sizes.length?`釣果：${sizes.join(' / ')}cm`:`釣果：${a.length}本`,''];a.forEach((x,i)=>{lines.push(`${i+1}本目${x.size?' '+x.size+'cm':''}`);if(x.lure)lines.push(`Lure：${x.lure}${x.color?' / '+x.color:''}`);if(x.rig)lines.push(`Rig：${x.rig}${x.sinkerWeight?' / '+x.sinkerWeight:''}`);if(x.rod)lines.push(`Rod：${x.rod}`);if(x.reel)lines.push(`Reel：${x.reel}`);if(x.lineType)lines.push(`Line：${lineText(x.lineType,x.lineLb)}`);if(x.situation)lines.push(x.situation);lines.push('')});$('snsText').value=lines.join('\n');$('snsFishSelect').innerHTML=a.map((x,i)=>`<label class="checkrow"><input type="radio" name="snsFish" value="${x.id}" ${i===0?'checked':''}><span>${x.size?x.size+'cm':'No size'} / ${esc(x.lure||'')}</span></label>`).join('');document.querySelectorAll('input[name=snsFish]').forEach(r=>r.onchange=()=>{selectedSNSCatch=a.find(x=>x.id===+r.value);drawInsta()});selectedSNSCatch=a[0];show('sns');drawInsta()}
-function drawInsta(){let x=selectedSNSCatch;if(!x||!catchPhoto(x))return;let c=$('instaCanvas'),ctx=c.getContext('2d'),im=new Image();im.onload=()=>{let sc=Math.max(c.width/im.width,c.height/im.height),w=im.width*sc,h=im.height*sc;ctx.drawImage(im,(c.width-w)/2,(c.height-h)/2,w,h);let lines=[];if(x.size)lines.push(x.size+'cm');if(x.lure)lines.push('LURE | '+x.lure+(x.color?' / '+x.color:''));if(x.rig)lines.push('RIG | '+x.rig+(x.sinkerWeight?' / '+x.sinkerWeight:''));if(x.rod)lines.push('ROD | '+x.rod);if(x.reel)lines.push('REEL | '+x.reel);if(x.lineType)lines.push('LINE | '+lineText(x.lineType,x.lineLb));ctx.font='600 34px sans-serif';let bw=Math.min(950,Math.max(420,...lines.map(v=>ctx.measureText(v).width))+56),bh=lines.length*48+56,pos=$('instaPos').value,bx=pos.endsWith('r')?c.width-bw-35:35,by=pos.startsWith('t')?35:c.height-bh-35;ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(bx,by,bw,bh);ctx.fillStyle='#fff';ctx.textBaseline='top';lines.forEach((v,i)=>ctx.fillText(v,bx+28,by+28+i*48))};im.src=catchPhoto(x)}
+async function drawInsta(){
+  let x=selectedSNSCatch;if(!x)return;
+  let src='';
+  try{const media=await mediaGet(x.mediaKey);if(media?.photos?.length){let i=Number.isInteger(x.coverIndex)?x.coverIndex:0;src=media.photos[i]||media.photos[0]}}catch(e){console.warn(e)}
+  if(!src)src=catchPhoto(x);if(!src)return;
+  let c=$('instaCanvas'),ctx=c.getContext('2d'),im=new Image();
+  im.onload=()=>{let sc=Math.max(c.width/im.width,c.height/im.height),w=im.width*sc,h=im.height*sc;ctx.drawImage(im,(c.width-w)/2,(c.height-h)/2,w,h);let lines=[];if(x.size)lines.push(x.size+'cm');if(x.lure)lines.push('LURE | '+x.lure+(x.color?' / '+x.color:''));if(x.rig)lines.push('RIG | '+x.rig+(x.sinkerWeight?' / '+x.sinkerWeight:''));if(x.rod)lines.push('ROD | '+x.rod);if(x.reel)lines.push('REEL | '+x.reel);if(x.lineType)lines.push('LINE | '+lineText(x.lineType,x.lineLb));ctx.font='600 34px sans-serif';let bw=Math.min(950,Math.max(420,...lines.map(v=>ctx.measureText(v).width))+56),bh=lines.length*48+56,pos=$('instaPos').value,bx=pos.endsWith('r')?c.width-bw-35:35,by=pos.startsWith('t')?35:c.height-bh-35;ctx.fillStyle='rgba(0,0,0,.6)';ctx.fillRect(bx,by,bw,bh);ctx.fillStyle='#fff';ctx.textBaseline='top';lines.forEach((v,i)=>ctx.fillText(v,bx+28,by+28+i*48))};
+  im.src=src;
+}
 $('instaPos').onchange=drawInsta;$('saveInsta').onclick=()=>{if(!selectedSNSCatch)return;let a=document.createElement('a');a.download=`BassLog_${selectedSNSCatch.date}.jpg`;a.href=$('instaCanvas').toDataURL('image/jpeg',.94);a.click()};
 
+async function startBassLog(){await migrateLegacyMedia();renderHome()}
 if('serviceWorker' in navigator)addEventListener('load',async()=>{try{
   const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
   await reg.update();
   let refreshing=false;
   navigator.serviceWorker.addEventListener('controllerchange',()=>{if(!refreshing){refreshing=true;location.reload()}});
-}catch(e){console.warn('SW update',e)}});renderHome();
+}catch(e){console.warn('SW update',e)}});
+startBassLog();
 
 let deferredInstallPrompt=null;
 window.addEventListener('beforeinstallprompt',e=>{
