@@ -1,5 +1,22 @@
-const CACHE='bass-log-v10-1';
+const CACHE='basslog-v10-4';
 const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
-self.addEventListener('install',e=>e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
-self.addEventListener('activate',e=>e.waitUntil(caches.keys().then(ks=>Promise.all(ks.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET')return;if(e.request.mode==='navigate'){e.respondWith(fetch(e.request).then(r=>{let x=r.clone();caches.open(CACHE).then(c=>c.put('./index.html',x));return r}).catch(()=>caches.match('./index.html')));return}e.respondWith(caches.match(e.request).then(x=>x||fetch(e.request).then(r=>{if(r&&r.status===200){let y=r.clone();caches.open(CACHE).then(c=>c.put(e.request,y))}return r}))) });
+self.addEventListener('install',event=>{
+  event.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
+});
+self.addEventListener('activate',event=>{
+  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
+});
+self.addEventListener('fetch',event=>{
+  if(event.request.method!=='GET')return;
+  const req=event.request;
+  const isNav=req.mode==='navigate'||new URL(req.url).pathname.endsWith('/index.html');
+  if(isNav){
+    event.respondWith(fetch(req,{cache:'no-store'}).then(res=>{
+      const copy=res.clone();caches.open(CACHE).then(c=>c.put('./index.html',copy));return res;
+    }).catch(()=>caches.match('./index.html')));
+    return;
+  }
+  event.respondWith(caches.match(req).then(cached=>cached||fetch(req).then(res=>{
+    const copy=res.clone();caches.open(CACHE).then(c=>c.put(req,copy));return res;
+  })));
+});
