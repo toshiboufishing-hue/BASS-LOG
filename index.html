@@ -130,12 +130,34 @@ body{background:linear-gradient(180deg,#07110f 0%,#091713 55%,#07110f 100%);colo
 @media(max-width:350px){.bassLogoImage{width:min(245px,100%)}.brandTagline{font-size:10px}}
 
 
-/* STAGE5: runtime home auto-fit. Visual design unchanged. */
-#home{
+/* STAGE5B: deterministic home auto-fit.
+   The home screen uses the actual viewport as a flex layout, so refresh and
+   return-to-home produce exactly the same size. Visual design unchanged. */
+.wrap.homeMode{
+  height:calc(100dvh - 62px - env(safe-area-inset-bottom));
+  min-height:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+.wrap.homeMode .brand{flex:0 0 auto}
+.wrap.homeMode #installAppBtn,
+.wrap.homeMode #installHint{flex:0 0 auto}
+.wrap.homeMode #home{
+  flex:1 1 auto;
+  height:auto !important;
   min-height:0 !important;
   max-height:none !important;
-  box-sizing:border-box;
+  display:flex !important;
+  flex-direction:column;
+  overflow:hidden;
 }
+.wrap.homeMode #home .homeMaxCards{flex:0 0 auto}
+.wrap.homeMode #home .calendarShell{
+  flex:1 1 auto;
+  min-height:0;
+}
+
 
 </style>
 </head><body>
@@ -364,7 +386,7 @@ const getTrip=()=>{try{return JSON.parse(localStorage.getItem(TRIPKEY)||'null')}
 const getHome=()=>{try{return JSON.parse(localStorage.getItem(HOMEKEY)||'{"mode":"pb","custom":""}')}catch{return{mode:'pb',custom:''}}},setHome=v=>localStorage.setItem(HOMEKEY,JSON.stringify(v));
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 let currentView='home';
-function show(v){currentView=v;['home','homeSettings','day','detail','trip','entry','measure','all','analysis','tackle','sns'].forEach(x=>$(x).style.display=x===v?'block':'none');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));if(v==='home')renderHome();if(v==='trip')renderTrip();if(v==='entry'){
+function show(v){currentView=v;document.querySelector('.wrap')?.classList.toggle('homeMode',v==='home');['home','homeSettings','day','detail','trip','entry','measure','all','analysis','tackle','sns'].forEach(x=>$(x).style.display=x===v?'block':'none');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));if(v==='home')renderHome();if(v==='trip')renderTrip();if(v==='entry'){
   if(returningFromMeasure){
     returningFromMeasure=false;
     restoreEntryDraft(entryDraft);
@@ -384,14 +406,9 @@ function maxCatch(list){return list.filter(r=>Number.isFinite(Number(r.size))).s
 function maxCardHTML(label,r){let img=catchPhoto(r);return `${img?`<img src="${img}">`:''}<div class="maxCardText"><div class="maxCardLabel">${label}</div><div class="maxCardSize">${r?esc(r.size)+' cm':'-- cm'}</div><div class="maxCardMeta">${r?esc(r.date)+' / '+esc(r.publicPlace||r.place||''): 'まだ記録なし'}</div></div>`}
 
 function fitHomeHeight(){
-  const home=$('home'), nav=document.querySelector('.nav');
-  if(!home || home.style.display==='none') return;
-  const vh=(window.visualViewport&&window.visualViewport.height)||window.innerHeight||document.documentElement.clientHeight;
-  const top=home.getBoundingClientRect().top;
-  const navH=nav?nav.getBoundingClientRect().height:0;
-  const gap=8;
-  const h=Math.max(360,Math.floor(vh-top-navH-gap));
-  home.style.height=h+'px';
+  const home=$('home');
+  if(!home)return;
+  home.style.removeProperty('height');
 }
 function scheduleHomeFit(){
   requestAnimationFrame(()=>requestAnimationFrame(fitHomeHeight));
@@ -936,6 +953,7 @@ function installBackGuard(){
 }
 
 async function startBassLog(){
+  document.querySelector('.wrap')?.classList.add('homeMode');
   installBackGuard();
   await migrateLegacyMedia();
   renderHome();
