@@ -134,11 +134,12 @@ body{background:linear-gradient(180deg,#07110f 0%,#091713 55%,#07110f 100%);colo
    The home screen uses the actual viewport as a flex layout, so refresh and
    return-to-home produce exactly the same size. Visual design unchanged. */
 .wrap.homeMode{
-  height:calc(100dvh - 62px - env(safe-area-inset-bottom));
+  height:calc(100dvh - 58px - env(safe-area-inset-bottom));
   min-height:0;
   overflow:hidden;
   display:flex;
   flex-direction:column;
+  padding-bottom:82px;
 }
 .wrap.homeMode .brand{flex:0 0 auto}
 .wrap.homeMode #installAppBtn,
@@ -156,6 +157,7 @@ body{background:linear-gradient(180deg,#07110f 0%,#091713 55%,#07110f 100%);colo
 .wrap.homeMode #home .calendarShell{
   flex:1 1 auto;
   min-height:0;
+  margin-bottom:0;
 }
 
 
