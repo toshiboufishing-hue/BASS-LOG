@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Bass Log v10.5</title>
+<title>Bass Log v10.6</title>
 <style>
 :root{--bg:#eef3f0;--card:#fff;--ink:#14201c;--muted:#64726c;--a:#153f34;--a2:#2c705b;--line:#d7e2dc;--danger:#a43e42;--glass:rgba(7,20,16,.58)}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -60,10 +60,46 @@ body{min-height:100dvh}.wrap{padding-bottom:calc(78px + env(safe-area-inset-bott
 @media(max-height:820px){.brand{margin-bottom:4px}.brand h1{font-size:21px}#home .homeMaxCards{gap:6px}.maxCard{height:105px}.maxCardSize{font-size:19px}.calendarShell{padding:7px 8px 6px}.calendarShell .day{min-height:44px}.calendarShell .mini{display:none}.calendarShell .week div{padding:2px}.tripBanner{padding:7px;margin:5px 0;font-size:11px}}
 @media(max-height:700px){.maxCard{height:88px}.maxCardMeta{display:none}.calendarShell .day{min-height:38px}.calendarShell .cnt{font-size:8px}}
 
+
+/* v10.6: home viewport fit */
+#home{
+  height:calc(100dvh - 198px - env(safe-area-inset-bottom));
+  min-height:520px;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
+}
+#home .homeMaxCards{flex:0 0 auto}
+#home .calendarShell{
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+}
+#home .calendarShell .monthbar,
+#home .calendarShell .week{flex:0 0 auto}
+#home .calendarShell .cal{
+  flex:1 1 auto;
+  min-height:0;
+  grid-auto-rows:minmax(42px,1fr);
+}
+#home .calendarShell .day{
+  min-height:0;
+  height:100%;
+}
+@media(max-height:820px){
+  #home{height:calc(100dvh - 184px - env(safe-area-inset-bottom));min-height:470px}
+  #home .calendarShell .cal{grid-auto-rows:minmax(36px,1fr)}
+}
+@media(max-height:700px){
+  #home{height:calc(100dvh - 170px - env(safe-area-inset-bottom));min-height:420px}
+  #home .calendarShell .cal{grid-auto-rows:minmax(31px,1fr)}
+}
+
 </style>
 </head><body>
 <div class="wrap">
-<div class="brand"><div><h1>🎣 Bass Log <small style='font-size:11px'>v10.5</small></h1><div class="muted">釣行を、もっと簡単に残す。</div></div><div class="muted">OFFLINE FIRST</div></div>
+<div class="brand"><div><h1>🎣 Bass Log <small style='font-size:11px'>v10.6</small></h1><div class="muted">釣行を、もっと簡単に残す。</div></div><div class="muted">OFFLINE FIRST</div></div>
 
 
 <button id="installAppBtn" class="btn pri" style="display:none;width:100%;margin:10px 0">
@@ -281,7 +317,8 @@ const setT=v=>localStorage.setItem(TKEY,JSON.stringify(v));
 const getTrip=()=>{try{return JSON.parse(localStorage.getItem(TRIPKEY)||'null')}catch{return null}},setTrip=v=>v?localStorage.setItem(TRIPKEY,JSON.stringify(v)):localStorage.removeItem(TRIPKEY);
 const getHome=()=>{try{return JSON.parse(localStorage.getItem(HOMEKEY)||'{"mode":"pb","custom":""}')}catch{return{mode:'pb',custom:''}}},setHome=v=>localStorage.setItem(HOMEKEY,JSON.stringify(v));
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
-function show(v){['home','homeSettings','day','detail','trip','entry','measure','all','analysis','tackle','sns'].forEach(x=>$(x).style.display=x===v?'block':'none');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));if(v==='home')renderHome();if(v==='trip')renderTrip();if(v==='entry'){
+let currentView='home';
+function show(v){currentView=v;['home','homeSettings','day','detail','trip','entry','measure','all','analysis','tackle','sns'].forEach(x=>$(x).style.display=x===v?'block':'none');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));if(v==='home')renderHome();if(v==='trip')renderTrip();if(v==='entry'){
   if(returningFromMeasure){
     returningFromMeasure=false;
     restoreEntryDraft(entryDraft);
@@ -813,7 +850,32 @@ async function drawInsta(){
 }
 $('instaPos').onchange=drawInsta;$('saveInsta').onclick=()=>{if(!selectedSNSCatch)return;let a=document.createElement('a');a.download=`BassLog_${selectedSNSCatch.date}.jpg`;a.href=$('instaCanvas').toDataURL('image/jpeg',.94);a.click()};
 
-async function startBassLog(){await migrateLegacyMedia();renderHome()}
+
+/* v10.6: Android/PWA back-key behavior
+   - Other screens: one Back returns to Home.
+   - Home: asks before leaving the app. */
+function installBackGuard(){
+  if(!history.state?.basslogGuard){
+    history.replaceState({basslogBase:true},'');
+    history.pushState({basslogGuard:true},'');
+  }
+  addEventListener('popstate',()=>{
+    if(currentView!=='home'){
+      history.pushState({basslogGuard:true},'');
+      show('home');
+      return;
+    }
+    const exit=confirm('Bass Logを終了しますか？');
+    if(exit){
+      // We are currently on the base entry; one more Back leaves the PWA/site.
+      history.back();
+    }else{
+      history.pushState({basslogGuard:true},'');
+    }
+  });
+}
+
+async function startBassLog(){installBackGuard();await migrateLegacyMedia();renderHome()}
 if('serviceWorker' in navigator)addEventListener('load',async()=>{try{
   const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
   await reg.update();
