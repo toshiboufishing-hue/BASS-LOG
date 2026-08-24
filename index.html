@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Bass Log v10.1</title>
+<title>Bass Log v10.2</title>
 <style>
 :root{--bg:#eef3f0;--card:#fff;--ink:#14201c;--muted:#64726c;--a:#153f34;--a2:#2c705b;--line:#d7e2dc;--danger:#a43e42;--glass:rgba(7,20,16,.58)}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -63,7 +63,7 @@ body{min-height:100dvh}.wrap{padding-bottom:calc(78px + env(safe-area-inset-bott
 </style>
 </head><body>
 <div class="wrap">
-<div class="brand"><div><h1>🎣 Bass Log <small style='font-size:11px'>v10.1</small></h1><div class="muted">釣行を、もっと簡単に残す。</div></div><div class="muted">OFFLINE FIRST</div></div>
+<div class="brand"><div><h1>🎣 Bass Log <small style='font-size:11px'>v10.2</small></h1><div class="muted">釣行を、もっと簡単に残す。</div></div><div class="muted">OFFLINE FIRST</div></div>
 
 
 <button id="installAppBtn" class="btn pri" style="display:none;width:100%;margin:10px 0">
@@ -286,6 +286,8 @@ $('saveCatch').onclick=()=>{
      lineLb:numOf('lineLb'),
      lure:valOf('lure','').trim(),
      color:valOf('color','').trim(),
+     rig:valOf('rig',''),
+     sinkerWeight:valOf('sinkerWeight',''),
      range:valOf('range','').trim(),
      method:valOf('method','').trim(),
      situation:valOf('situation','').trim()
