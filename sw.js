@@ -1,5 +1,5 @@
-const CACHE='basslog-v10-6-stage3-header';
-const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
+const CACHE='basslog-v10-6-stage4-brush-logo';
+const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png','./basslog_brush_logo.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
 });
