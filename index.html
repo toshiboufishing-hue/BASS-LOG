@@ -7,7 +7,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="apple-touch-icon" href="icon-192.png">
-<title>Bass Log v10.6</title>
+<title>Bass Log v10.7</title>
 <style>
 :root{--bg:#eef3f0;--card:#fff;--ink:#14201c;--muted:#64726c;--a:#153f34;--a2:#2c705b;--line:#d7e2dc;--danger:#a43e42;--glass:rgba(7,20,16,.58)}
 *{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}
@@ -96,10 +96,28 @@ body{min-height:100dvh}.wrap{padding-bottom:calc(78px + env(safe-area-inset-bott
   #home .calendarShell .cal{grid-auto-rows:minmax(31px,1fr)}
 }
 
+
+/* v10.7 visual refresh */
+.bassBrand{align-items:center;margin:0 2px 8px;gap:12px}
+.bassLogo{font-family:Impact,"Arial Black",system-ui,sans-serif;font-style:italic;font-weight:950;font-size:31px;letter-spacing:-1.6px;line-height:1;color:#102c26;text-transform:uppercase;transform:skew(-5deg);text-shadow:0 1px 0 #fff}
+.bassLogo:after{content:"";display:block;width:82%;height:4px;margin-top:3px;background:linear-gradient(90deg,#77a900,#b4df24 65%,transparent);transform:skew(-18deg);border-radius:100%}
+.bassLogo small{font-family:system-ui,sans-serif;font-style:normal;font-size:11px;letter-spacing:0;color:#527262;margin-left:5px}
+.brandTag{margin-left:auto;border-left:2px solid #8dbb19;padding-left:9px;font-size:11px;font-style:italic;line-height:1.15;text-align:left;color:#355248;white-space:nowrap}
+.brandTag span,.brandTag b{display:block}.brandTag b{color:#739f00;margin-top:2px}
+.calendarShell{background:linear-gradient(155deg,#17483d 0%,#10382f 52%,#08251f 100%);box-shadow:0 9px 25px rgba(7,35,27,.20)}
+.calendarShell:before{content:"";position:absolute;inset:56px -30px 4px 20px;width:auto;height:auto;border:0;border-radius:0;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20900%20700%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23b8d2c7%22%20stroke-width%3D%2211%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M90%20420C170%20210%20390%20105%20600%20165c65%2018%20118%2052%20150%2098-92-27-164-12-213%2033%2089%205%20164%2049%20214%20130-57%20111-173%20183-328%20184-135%201-253-53-333-190Z%22%2F%3E%3Cpath%20d%3D%22M539%20296c74-98%20175-123%20274-74-70%2037-113%2089-130%20156%2058-25%20112-23%20165%208-69%2085-150%20128-243%20128%22%2F%3E%3Cpath%20d%3D%22M558%20292c-42%2044-61%2093-57%20147%205%2063%2043%20112%20104%20147%22%2F%3E%3Cpath%20d%3D%22M233%20353c79-54%20176-70%20291-48M216%20457c101%2039%20205%2049%20313%2027M174%20506c74%2048%20151%2077%20232%2086%22%2F%3E%3Ccircle%20cx%3D%22485%22%20cy%3D%22246%22%20r%3D%2222%22%2F%3E%3Ccircle%20cx%3D%22491%22%20cy%3D%22241%22%20r%3D%226%22%20fill%3D%22%23b8d2c7%22%2F%3E%3Cpath%20d%3D%22M149%20392l-75-55%2093%2011M153%20474l-93%2052%20112-13M310%20563l-40%2092%2085-70%22%2F%3E%3Cpath%20d%3D%22M278%20276l-24-82%2076%2061M350%20230l6-91%2051%2079M428%20213l30-78%2025%2084%22%2F%3E%3Cpath%20d%3D%22M650%20194c55-9%20107%202%20158%2034M685%20382c58%209%20105%2030%20143%2065%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");background-repeat:no-repeat;background-position:center;background-size:95% 95%;opacity:.17;filter:drop-shadow(0 0 1px rgba(255,255,255,.15));pointer-events:none}
+.calendarShell:after{display:none}
+.calendarShell .day{background:rgba(255,255,255,.065);border-color:rgba(255,255,255,.12)}
+.calendarShell .day.has{position:relative;background:linear-gradient(145deg,rgba(116,176,70,.36),rgba(23,80,54,.56));border-color:rgba(177,224,96,.68);box-shadow:inset 0 0 18px rgba(151,210,69,.08),0 0 8px rgba(151,210,69,.08)}
+.calendarShell .day.has:after{content:"";position:absolute;right:4px;bottom:4px;width:25px;height:25px;background-image:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20900%20700%22%3E%3Cg%20fill%3D%22none%22%20stroke%3D%22%23b8d2c7%22%20stroke-width%3D%2211%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpath%20d%3D%22M90%20420C170%20210%20390%20105%20600%20165c65%2018%20118%2052%20150%2098-92-27-164-12-213%2033%2089%205%20164%2049%20214%20130-57%20111-173%20183-328%20184-135%201-253-53-333-190Z%22%2F%3E%3Cpath%20d%3D%22M539%20296c74-98%20175-123%20274-74-70%2037-113%2089-130%20156%2058-25%20112-23%20165%208-69%2085-150%20128-243%20128%22%2F%3E%3Cpath%20d%3D%22M558%20292c-42%2044-61%2093-57%20147%205%2063%2043%20112%20104%20147%22%2F%3E%3Cpath%20d%3D%22M233%20353c79-54%20176-70%20291-48M216%20457c101%2039%20205%2049%20313%2027M174%20506c74%2048%20151%2077%20232%2086%22%2F%3E%3Ccircle%20cx%3D%22485%22%20cy%3D%22246%22%20r%3D%2222%22%2F%3E%3Ccircle%20cx%3D%22491%22%20cy%3D%22241%22%20r%3D%226%22%20fill%3D%22%23b8d2c7%22%2F%3E%3Cpath%20d%3D%22M149%20392l-75-55%2093%2011M153%20474l-93%2052%20112-13M310%20563l-40%2092%2085-70%22%2F%3E%3Cpath%20d%3D%22M278%20276l-24-82%2076%2061M350%20230l6-91%2051%2079M428%20213l30-78%2025%2084%22%2F%3E%3Cpath%20d%3D%22M650%20194c55-9%20107%202%20158%2034M685%20382c58%209%20105%2030%20143%2065%22%2F%3E%3C%2Fg%3E%3C%2Fsvg%3E");background-size:contain;background-position:center;background-repeat:no-repeat;opacity:.20;pointer-events:none}
+.calendarShell .day.today{outline:2px solid #e7f4ee;box-shadow:0 0 0 1px rgba(255,255,255,.25)}
+.calendarShell .cnt{color:#f0ffe7;text-shadow:0 1px 2px rgba(0,0,0,.45)}
+@media(max-height:820px){.bassLogo{font-size:27px}.brandTag{font-size:10px}}
+
 </style>
 </head><body>
 <div class="wrap">
-<div class="brand"><div><h1>🎣 Bass Log <small style='font-size:11px'>v10.6</small></h1><div class="muted">釣行を、もっと簡単に残す。</div></div><div class="muted">OFFLINE FIRST</div></div>
+<div class="brand bassBrand"><div class="bassLogo">BASS LOG <small>v10.7</small></div><div class="brandTag"><span>Fish More.</span><b>Log Easy.</b></div></div>
 
 
 <button id="installAppBtn" class="btn pri" style="display:none;width:100%;margin:10px 0">
