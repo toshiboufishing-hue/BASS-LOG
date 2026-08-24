@@ -129,6 +129,14 @@ body{background:linear-gradient(180deg,#07110f 0%,#091713 55%,#07110f 100%);colo
 @media(max-width:430px){.bassLogoImage{width:min(300px,100%)}.brandTagline{font-size:11px;padding-left:8px}}
 @media(max-width:350px){.bassLogoImage{width:min(245px,100%)}.brandTagline{font-size:10px}}
 
+
+/* STAGE5: runtime home auto-fit. Visual design unchanged. */
+#home{
+  min-height:0 !important;
+  max-height:none !important;
+  box-sizing:border-box;
+}
+
 </style>
 </head><body>
 <div class="wrap">
@@ -374,7 +382,21 @@ function applyEarliestPhotoTime(){let a=photoMeta.filter(Boolean).sort((x,y)=>x.
 function catchPhoto(r){if(r?.thumb)return r.thumb;if(Array.isArray(r?.photos)&&r.photos.length){let i=Number.isInteger(r.coverIndex)?r.coverIndex:0;return r.photos[i]||r.photos[0]}return r?.photo||''}
 function maxCatch(list){return list.filter(r=>Number.isFinite(Number(r.size))).sort((a,b)=>Number(b.size)-Number(a.size))[0]||null}
 function maxCardHTML(label,r){let img=catchPhoto(r);return `${img?`<img src="${img}">`:''}<div class="maxCardText"><div class="maxCardLabel">${label}</div><div class="maxCardSize">${r?esc(r.size)+' cm':'-- cm'}</div><div class="maxCardMeta">${r?esc(r.date)+' / '+esc(r.publicPlace||r.place||''): 'まだ記録なし'}</div></div>`}
-function renderHome(){let all=getR(),now=new Date(),y=now.getFullYear(),mo=now.getMonth(),month=all.filter(r=>{let d=new Date(r.date+'T00:00:00');return d.getFullYear()===y&&d.getMonth()===mo}),year=all.filter(r=>new Date(r.date+'T00:00:00').getFullYear()===y);$('maxMonth').innerHTML=maxCardHTML('今月最大',maxCatch(month));$('maxYear').innerHTML=maxCardHTML('今年最大',maxCatch(year));$('maxAll').innerHTML=maxCardHTML('歴代最大',maxCatch(all));renderCalendar();let trip=getTrip();if(trip){$('tripBanner').style.display='block';$('tripBanner').innerHTML=`<b>🚤 今日の釣行：${esc(trip.publicPlace)}</b><div class="muted">${esc(trip.date)} / ${esc(trip.ride||'')}</div><div class="tripTackles">${(trip.setNames||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>`}else $('tripBanner').style.display='none'}
+
+function fitHomeHeight(){
+  const home=$('home'), nav=document.querySelector('.nav');
+  if(!home || home.style.display==='none') return;
+  const vh=(window.visualViewport&&window.visualViewport.height)||window.innerHeight||document.documentElement.clientHeight;
+  const top=home.getBoundingClientRect().top;
+  const navH=nav?nav.getBoundingClientRect().height:0;
+  const gap=8;
+  const h=Math.max(360,Math.floor(vh-top-navH-gap));
+  home.style.height=h+'px';
+}
+function scheduleHomeFit(){
+  requestAnimationFrame(()=>requestAnimationFrame(fitHomeHeight));
+}
+function renderHome(){let all=getR(),now=new Date(),y=now.getFullYear(),mo=now.getMonth(),month=all.filter(r=>{let d=new Date(r.date+'T00:00:00');return d.getFullYear()===y&&d.getMonth()===mo}),year=all.filter(r=>new Date(r.date+'T00:00:00').getFullYear()===y);$('maxMonth').innerHTML=maxCardHTML('今月最大',maxCatch(month));$('maxYear').innerHTML=maxCardHTML('今年最大',maxCatch(year));$('maxAll').innerHTML=maxCardHTML('歴代最大',maxCatch(all));renderCalendar();let trip=getTrip();if(trip){$('tripBanner').style.display='block';$('tripBanner').innerHTML=`<b>🚤 今日の釣行：${esc(trip.publicPlace)}</b><div class="muted">${esc(trip.date)} / ${esc(trip.ride||'')}</div><div class="tripTackles">${(trip.setNames||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>`}else $('tripBanner').style.display='none';scheduleHomeFit()}
 function renderHero(){}
 function renderCalendar(){let y=cur.getFullYear(),m=cur.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),all=getR(),today=new Date();$('mt').textContent=`${y}年 ${m+1}月`;let h='';for(let i=0;i<first;i++)h+='<div class="day empty"></div>';for(let d=1;d<=days;d++){let ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,a=all.filter(x=>x.date===ds),p=catchPhoto(a.find(x=>catchPhoto(x))),td=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;h+=`<button class="day ${a.length?'has':''} ${td?'today':''}" data-date="${ds}"><div class="num">${d}</div>${a.length?`<div class="cnt">🎣 ${a.length}本</div>${p?`<img class="mini" src="${p}">`:''}`:''}</button>`}$('cal').innerHTML=h;document.querySelectorAll('.day[data-date]').forEach(b=>b.onclick=()=>openDay(b.dataset.date))}
 function openDay(date){selectedDate=date;let a=getR().filter(x=>x.date===date);$('dt').textContent=date.replaceAll('-','/');let pub=a[0]?.publicPlace||a[0]?.place||'-';$('daySummary').innerHTML=`<b>📍 ${esc(pub)}</b><div class="muted">${a.length}本 / 最大 ${a.map(x=>x.size).filter(Number.isFinite).length?Math.max(...a.map(x=>x.size).filter(Number.isFinite))+'cm':'-'}</div>`;$('gal').innerHTML=a.length?a.map(x=>`<button class="g" data-id="${x.id}">${catchPhoto(x)?`<img src="${catchPhoto(x)}">`:`<div class="ph">🎣</div>`}<div class="cap"><b>${x.size?x.size+'cm':'サイズ未入力'}</b><div class="muted">${esc(x.lure||'')}</div></div></button>`).join(''):'<div class="card">この日の釣果はありません</div>';document.querySelectorAll('.g').forEach(b=>b.onclick=()=>openDetail(+b.dataset.id));show('day')}
@@ -913,7 +935,18 @@ function installBackGuard(){
   });
 }
 
-async function startBassLog(){installBackGuard();await migrateLegacyMedia();renderHome()}
+async function startBassLog(){
+  installBackGuard();
+  await migrateLegacyMedia();
+  renderHome();
+  scheduleHomeFit();
+}
+addEventListener('resize',scheduleHomeFit);
+addEventListener('orientationchange',scheduleHomeFit);
+if(window.visualViewport){
+  visualViewport.addEventListener('resize',scheduleHomeFit);
+  visualViewport.addEventListener('scroll',scheduleHomeFit);
+}
 if('serviceWorker' in navigator)addEventListener('load',async()=>{try{
   const reg=await navigator.serviceWorker.register('./sw.js',{updateViaCache:'none'});
   await reg.update();
