@@ -168,6 +168,19 @@ body{background:linear-gradient(180deg,#07110f 0%,#091713 55%,#07110f 100%);colo
 @media(max-height:820px){#home .maxCard{height:auto;aspect-ratio:4/5}}
 @media(max-height:700px){#home .maxCard{height:auto;aspect-ratio:4/5}}
 
+
+/* STAGE6: Instagram AI style-learning library */
+.learnHero{border:1px solid #365348;background:linear-gradient(180deg,rgba(18,49,41,.94),rgba(7,25,20,.96));}
+.learnHero h3{margin-bottom:6px}
+.learnCount{font-size:28px;font-weight:900;color:#a7f124;line-height:1}
+.learnSample{border:1px solid #365348;border-radius:14px;padding:12px;margin-top:10px;background:rgba(6,22,18,.72)}
+.learnSampleHead{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:6px}
+.learnSampleText{white-space:pre-wrap;line-height:1.55;color:#e8f0ed;font-size:13px;max-height:170px;overflow:auto}
+.learnSampleMemo{color:#9fb5ad;font-size:11px;margin-top:6px}
+.learnActions{display:flex;gap:8px;margin-top:9px}
+.learnActions button{flex:1}
+.learnHint{border-left:4px solid #a7f124;padding-left:10px;color:#b8c7c1;font-size:12px;line-height:1.55}
+
 </style>
 </head><body>
 <div class="wrap">
@@ -269,8 +282,43 @@ Chromeのメニューから「アプリをインストール」でも追加で�
 
 <section id="tackle" style="display:none"><div class="card"><h3>🎣 ロッド</h3><div class="regRow"><input id="newRod" placeholder="ロッド名"><button id="addRod" class="btn pri">追加</button></div><div id="rodList"></div></div><div class="card"><h3>⚙️ リール</h3><div class="note" style="margin-bottom:10px">主要3メーカーの2000年代後半〜2026年モデルを、新しい順で候補から登録できます。主要モデルはメーカー資料を優先して見直しています。候補に無い機種は従来どおり手入力できます。</div><div class="grid"><div><label>メーカー</label><select id="reelMaker"><option value="">選択</option><option>SHIMANO</option><option>DAIWA</option><option>Abu Garcia</option></select></div><div><label>モデル</label><select id="reelModel"><option value="">メーカーを選択</option></select></div><div><label>ギヤ比</label><select id="reelGear"><option value="">モデルを選択</option></select></div><div><label>ハンドル</label><select id="reelHand"><option value="">指定なし</option><option>RIGHT</option><option>LEFT</option></select></div></div><button id="addReelCatalog" class="btn pri" style="width:100%;margin:10px 0 12px">候補からリール登録</button><div class="regRow"><input id="newReel" placeholder="候補に無いリール名を手入力"><button id="addReel" class="btn sec">手動追加</button></div><div id="reelList"></div></div><div class="card"><h3>⭐ タックルセット</h3><div class="grid"><div class="full"><label>セット名</label><input id="newSetName" placeholder="例：MH巻物"></div><div><label>ロッド</label><select id="newSetRod"></select></div><div><label>リール</label><select id="newSetReel"></select></div><div><label>ライン</label><select id="newSetLineType"><option>フロロ</option><option>ナイロン</option><option>カーボナイロン</option><option>PE</option></select></div><div><label id="newSetSizeLabel">lb</label><select id="newSetLb"></select></div></div><button id="addSet" class="btn pri" style="width:100%;margin-top:10px">セット登録</button><div id="setList"></div></div></section>
 
-<section id="sns" style="display:none"><button id="backSNS" class="btn sec">← 日別一覧</button><div class="card"><h3>📸 Instagram投稿素材</h3><div id="snsPrivacy" class="note privacy"></div><textarea id="snsText" class="snsText"></textarea><div class="note">※これはオフラインで作る投稿素材。AI文体生成はオンライン連携版で追加予定。</div></div><div class="card"><h3>4:5 写真テンプレート</h3><div id="snsFishSelect"></div><canvas id="instaCanvas" class="instaCanvas" width="1080" height="1350"></canvas><div class="grid" style="margin-top:10px"><div><label>文字位置</label><select id="instaPos"><option value="bl">左下</option><option value="br">右下</option><option value="tl">左上</option><option value="tr">右上</option></select></div><button id="saveInsta" class="btn pri" style="align-self:end">画像を保存</button></div></div></section>
+<section id="sns" style="display:none"><button id="backSNS" class="btn sec">← 日別一覧</button><div class="card"><h3>📸 Instagram投稿素材</h3><div id="snsPrivacy" class="note privacy"></div><textarea id="snsText" class="snsText"></textarea><div class="note">※これはオフラインで作る投稿素材。AI文体生成はオンライン連携版で追加予定。</div>
+<div class="grid" style="margin-top:10px">
+  <button id="saveCurrentAsLearn" class="btn sec">🧠 この文章を学習用に保存</button>
+  <button id="openInstaLearn" class="btn pri">✨ 文体学習ライブラリ</button>
+</div></div><div class="card"><h3>4:5 写真テンプレート</h3><div id="snsFishSelect"></div><canvas id="instaCanvas" class="instaCanvas" width="1080" height="1350"></canvas><div class="grid" style="margin-top:10px"><div><label>文字位置</label><select id="instaPos"><option value="bl">左下</option><option value="br">右下</option><option value="tl">左上</option><option value="tr">右上</option></select></div><button id="saveInsta" class="btn pri" style="align-self:end">画像を保存</button></div></div></section>
 </div>
+
+
+<section id="instaLearn" style="display:none">
+  <button id="backInstaLearn" class="btn sec">← Instagram投稿素材</button>
+
+  <div class="card learnHero">
+    <h3>🧠 Instagram 文体学習</h3>
+    <div class="learnHint">
+      過去に自分で投稿した文章や、AI生成後に自分で直した完成文をここへ保存。<br>
+      将来のAI文章生成では、このライブラリを「自分らしい文章」のお手本として使う。
+    </div>
+    <div style="display:flex;align-items:end;justify-content:space-between;margin-top:12px">
+      <div><div class="note">登録済みサンプル</div><div id="learnCount" class="learnCount">0</div></div>
+      <div class="note" style="text-align:right">目安：20〜50投稿<br>少なくても開始OK</div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>＋ 学習文章を追加</h3>
+    <label>投稿文</label>
+    <textarea id="learnText" class="snsText" placeholder="過去のInstagram投稿文をそのまま貼り付け"></textarea>
+    <label style="margin-top:10px">メモ（任意）</label>
+    <input id="learnMemo" placeholder="例：夏の高滝 / 釣果4本 / テンション高め">
+    <button id="saveLearnSample" class="btn pri" style="width:100%;margin-top:10px">学習ライブラリに保存</button>
+  </div>
+
+  <div class="card">
+    <h3>📚 保存した文章</h3>
+    <div id="learnList"></div>
+  </div>
+</section>
 
 <nav class="nav"><button data-v="home" class="active"><b>🏠</b>ホーム</button><button data-v="trip"><b>🚤</b>釣行</button><button data-v="entry"><b>➕</b>釣果</button><button data-v="all"><b>🎣</b>一覧</button><button data-v="tackle"><b>🧰</b>タックル</button></nav>
 <script>
@@ -395,7 +443,7 @@ const getTrip=()=>{try{return JSON.parse(localStorage.getItem(TRIPKEY)||'null')}
 const getHome=()=>{try{return JSON.parse(localStorage.getItem(HOMEKEY)||'{"mode":"pb","custom":""}')}catch{return{mode:'pb',custom:''}}},setHome=v=>localStorage.setItem(HOMEKEY,JSON.stringify(v));
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 let currentView='home';
-function show(v){currentView=v;document.querySelector('.wrap')?.classList.toggle('homeMode',v==='home');['home','homeSettings','day','detail','trip','entry','measure','all','analysis','tackle','sns'].forEach(x=>$(x).style.display=x===v?'block':'none');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));if(v==='home')renderHome();if(v==='trip')renderTrip();if(v==='entry'){
+function show(v){currentView=v;document.querySelector('.wrap')?.classList.toggle('homeMode',v==='home');['home','homeSettings','day','detail','trip','entry','measure','all','analysis','tackle','sns','instaLearn'].forEach(x=>$(x).style.display=x===v?'block':'none');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));if(v==='home')renderHome();if(v==='trip')renderTrip();if(v==='entry'){
   if(returningFromMeasure){
     returningFromMeasure=false;
     restoreEntryDraft(entryDraft);
@@ -924,7 +972,91 @@ $('addReelCatalog').onclick=()=>{let m=$('reelMaker').value,i=$('reelModel').val
 function renderTackle(){let t=getT(),row=(x,i,c)=>`<div class="regItem"><span>${esc(x)}</span><button class="btn danger ${c}" data-i="${i}">削除</button></div>`;$('rodList').innerHTML=t.rods.map((x,i)=>row(x,i,'delRod')).join('')||'<div class="note">未登録</div>';$('reelList').innerHTML=t.reels.map((x,i)=>row(x,i,'delReel')).join('')||'<div class="note">未登録</div>';$('newSetRod').innerHTML=t.rods.map(x=>`<option>${esc(x)}</option>`).join('');$('newSetReel').innerHTML=t.reels.map(x=>`<option>${esc(x)}</option>`).join('');$('setList').innerHTML=t.sets.map((x,i)=>`<div class="tackleSet"><b>${esc(x.name)}</b><div class="muted">${esc(x.rod)} / ${esc(x.reel)} / ${esc(x.type)} ${x.lb}${lineUnit(x.type)}</div><button class="btn danger delSet" data-i="${i}" style="margin-top:7px">削除</button></div>`).join('')||'<div class="note">未登録</div>';document.querySelectorAll('.delRod').forEach(b=>b.onclick=()=>{let t=getT();t.rods.splice(+b.dataset.i,1);setT(t);renderTackle()});document.querySelectorAll('.delReel').forEach(b=>b.onclick=()=>{let t=getT();t.reels.splice(+b.dataset.i,1);setT(t);renderTackle()});document.querySelectorAll('.delSet').forEach(b=>b.onclick=()=>{let t=getT();t.sets.splice(+b.dataset.i,1);setT(t);renderTackle()})}
 $('addRod').onclick=()=>{let v=$('newRod').value.trim();if(!v)return;let t=getT();if(!t.rods.includes(v))t.rods.push(v);setT(t);$('newRod').value='';renderTackle()};$('addReel').onclick=()=>{let v=$('newReel').value.trim();if(!v)return;let t=getT();if(!t.reels.includes(v))t.reels.push(v);setT(t);$('newReel').value='';renderTackle()};$('addSet').onclick=()=>{let n=$('newSetName').value.trim(),lb=parseFloat($('newSetLb').value);if(!n||!$('newSetRod').value||!$('newSetReel').value||!lb){alert('セット内容を入力してね');return}let t=getT();t.sets.push({name:n,rod:$('newSetRod').value,reel:$('newSetReel').value,type:$('newSetLineType').value,lb});setT(t);$('newSetName').value='';$('newSetLb').value='';renderTackle()};
 
-$('daySNS').onclick=()=>openSNS(selectedDate);$('backSNS').onclick=()=>openDay(currentSNSDate);function openSNS(date){currentSNSDate=date;let a=getR().filter(x=>x.date===date);if(!a.length)return;let pub=a[0].publicPlace||'非公開';let safe=['野池','溜池','非公開'].includes(pub);$('snsPrivacy').innerHTML=`<strong>公開場所：${esc(pub)}</strong><br>${safe?'詳細場所は投稿素材に含めません。':'自分用の詳細場所は投稿素材に含めません。'}`;let sizes=a.map(x=>x.size).filter(Number.isFinite),lines=[`${date.replaceAll('-','/')} ${pub} 🎣`,sizes.length?`釣果：${sizes.join(' / ')}cm`:`釣果：${a.length}本`,''];a.forEach((x,i)=>{lines.push(`${i+1}本目${x.size?' '+x.size+'cm':''}`);if(x.lure)lines.push(`Lure：${x.lure}${x.color?' / '+x.color:''}`);if(x.rig)lines.push(`Rig：${x.rig}${x.sinkerWeight?' / '+x.sinkerWeight:''}`);if(x.rod)lines.push(`Rod：${x.rod}`);if(x.reel)lines.push(`Reel：${x.reel}`);if(x.lineType)lines.push(`Line：${lineText(x.lineType,x.lineLb)}`);if(x.situation)lines.push(x.situation);lines.push('')});$('snsText').value=lines.join('\n');$('snsFishSelect').innerHTML=a.map((x,i)=>`<label class="checkrow"><input type="radio" name="snsFish" value="${x.id}" ${i===0?'checked':''}><span>${x.size?x.size+'cm':'No size'} / ${esc(x.lure||'')}</span></label>`).join('');document.querySelectorAll('input[name=snsFish]').forEach(r=>r.onchange=()=>{selectedSNSCatch=a.find(x=>x.id===+r.value);drawInsta()});selectedSNSCatch=a[0];show('sns');drawInsta()}
+
+const INSTA_LEARN_KEY='basslog_insta_style_samples_v1';
+function getInstaLearnSamples(){
+  try{
+    const v=JSON.parse(localStorage.getItem(INSTA_LEARN_KEY)||'[]');
+    return Array.isArray(v)?v:[];
+  }catch(e){return []}
+}
+function setInstaLearnSamples(v){
+  localStorage.setItem(INSTA_LEARN_KEY,JSON.stringify(v));
+}
+function renderInstaLearn(){
+  const a=getInstaLearnSamples().sort((x,y)=>(y.createdAt||0)-(x.createdAt||0));
+  $('learnCount').textContent=a.length;
+  $('learnList').innerHTML=a.length?a.map(x=>`
+    <div class="learnSample">
+      <div class="learnSampleHead">
+        <strong>${esc(x.dateLabel||'学習サンプル')}</strong>
+        <span class="note">${x.text.length}文字</span>
+      </div>
+      <div class="learnSampleText">${esc(x.text)}</div>
+      ${x.memo?`<div class="learnSampleMemo">📝 ${esc(x.memo)}</div>`:''}
+      <div class="learnActions">
+        <button class="btn sec" data-learn-edit="${x.id}">編集</button>
+        <button class="btn danger" data-learn-del="${x.id}">削除</button>
+      </div>
+    </div>`).join(''):'<div class="note">まだ登録がありません。過去のInstagram投稿文を追加していこう。</div>';
+  document.querySelectorAll('[data-learn-del]').forEach(b=>b.onclick=()=>{
+    const id=b.dataset.learnDel;
+    if(!confirm('この学習文章を削除しますか？'))return;
+    setInstaLearnSamples(getInstaLearnSamples().filter(x=>x.id!==id));
+    renderInstaLearn();
+  });
+  document.querySelectorAll('[data-learn-edit]').forEach(b=>b.onclick=()=>{
+    const x=getInstaLearnSamples().find(v=>v.id===b.dataset.learnEdit);
+    if(!x)return;
+    $('learnText').value=x.text||'';
+    $('learnMemo').value=x.memo||'';
+    $('saveLearnSample').dataset.editId=x.id;
+    $('saveLearnSample').textContent='変更を保存';
+    $('learnText').scrollIntoView({behavior:'smooth',block:'center'});
+  });
+}
+function openInstaLearn(prefill=''){
+  if(prefill)$('learnText').value=prefill;
+  renderInstaLearn();
+  show('instaLearn');
+}
+function saveLearnSample(){
+  const text=$('learnText').value.trim();
+  if(!text){alert('学習させる投稿文を入力してください。');return}
+  const memo=$('learnMemo').value.trim();
+  const a=getInstaLearnSamples();
+  const editId=$('saveLearnSample').dataset.editId||'';
+  if(editId){
+    const x=a.find(v=>v.id===editId);
+    if(x){x.text=text;x.memo=memo;x.updatedAt=Date.now()}
+  }else{
+    a.push({
+      id:'learn_'+Date.now()+'_'+Math.random().toString(36).slice(2,7),
+      text,memo,
+      dateLabel:new Date().toLocaleDateString('ja-JP'),
+      createdAt:Date.now()
+    });
+  }
+  setInstaLearnSamples(a);
+  $('learnText').value='';
+  $('learnMemo').value='';
+  delete $('saveLearnSample').dataset.editId;
+  $('saveLearnSample').textContent='学習ライブラリに保存';
+  renderInstaLearn();
+}
+
+$('daySNS').onclick=()=>openSNS(selectedDate);
+$('backSNS').onclick=()=>openDay(currentSNSDate);
+$('openInstaLearn').onclick=()=>openInstaLearn();
+$('backInstaLearn').onclick=()=>{show('sns');drawInsta()};
+$('saveLearnSample').onclick=saveLearnSample;
+$('saveCurrentAsLearn').onclick=()=>{
+  const t=$('snsText').value.trim();
+  if(!t){alert('保存する文章がありません。');return}
+  $('learnText').value=t;
+  $('learnMemo').value=currentSNSDate?`${currentSNSDate} の投稿素材`:'';
+  openInstaLearn();
+};function openSNS(date){currentSNSDate=date;let a=getR().filter(x=>x.date===date);if(!a.length)return;let pub=a[0].publicPlace||'非公開';let safe=['野池','溜池','非公開'].includes(pub);$('snsPrivacy').innerHTML=`<strong>公開場所：${esc(pub)}</strong><br>${safe?'詳細場所は投稿素材に含めません。':'自分用の詳細場所は投稿素材に含めません。'}`;let sizes=a.map(x=>x.size).filter(Number.isFinite),lines=[`${date.replaceAll('-','/')} ${pub} 🎣`,sizes.length?`釣果：${sizes.join(' / ')}cm`:`釣果：${a.length}本`,''];a.forEach((x,i)=>{lines.push(`${i+1}本目${x.size?' '+x.size+'cm':''}`);if(x.lure)lines.push(`Lure：${x.lure}${x.color?' / '+x.color:''}`);if(x.rig)lines.push(`Rig：${x.rig}${x.sinkerWeight?' / '+x.sinkerWeight:''}`);if(x.rod)lines.push(`Rod：${x.rod}`);if(x.reel)lines.push(`Reel：${x.reel}`);if(x.lineType)lines.push(`Line：${lineText(x.lineType,x.lineLb)}`);if(x.situation)lines.push(x.situation);lines.push('')});$('snsText').value=lines.join('\n');$('snsFishSelect').innerHTML=a.map((x,i)=>`<label class="checkrow"><input type="radio" name="snsFish" value="${x.id}" ${i===0?'checked':''}><span>${x.size?x.size+'cm':'No size'} / ${esc(x.lure||'')}</span></label>`).join('');document.querySelectorAll('input[name=snsFish]').forEach(r=>r.onchange=()=>{selectedSNSCatch=a.find(x=>x.id===+r.value);drawInsta()});selectedSNSCatch=a[0];show('sns');drawInsta()}
 async function drawInsta(){
   let x=selectedSNSCatch;if(!x)return;
   let src='';
