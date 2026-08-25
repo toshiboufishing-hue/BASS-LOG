@@ -181,8 +181,18 @@ body{background:linear-gradient(180deg,#07110f 0%,#091713 55%,#07110f 100%);colo
 .learnActions button{flex:1}
 .learnHint{border-left:4px solid #a7f124;padding-left:10px;color:#b8c7c1;font-size:12px;line-height:1.55}
 
+
+/* STAGE7: Home AI STYLE shortcut */
+.aiStyleHome{position:fixed;right:14px;top:78px;border:1px solid rgba(167,241,36,.45);
+background:linear-gradient(180deg,rgba(18,49,41,.96),rgba(7,25,20,.96));color:#eaf5ef;
+border-radius:999px;padding:6px 10px;font-size:11px;font-weight:900;letter-spacing:.04em;
+box-shadow:0 0 14px rgba(167,241,36,.10);display:flex;align-items:center;gap:6px;cursor:pointer;z-index:20}
+.aiStyleHome .aiCount{min-width:20px;height:20px;padding:0 5px;border-radius:999px;display:inline-flex;
+align-items:center;justify-content:center;background:#a7f124;color:#0a1c16;font-size:11px;font-weight:1000}
+.aiStyleHome:active{transform:scale(.98)}
+
 </style>
-</head><body>
+</head><body><button id="homeAIStyle" class="aiStyleHome" type="button">🧠 AI STYLE <span id="homeAILearnCount" class="aiCount">0</span></button>
 <div class="wrap">
 <div class="brand brandStage3">
   <div class="bassLogoWrap">
@@ -443,7 +453,7 @@ const getTrip=()=>{try{return JSON.parse(localStorage.getItem(TRIPKEY)||'null')}
 const getHome=()=>{try{return JSON.parse(localStorage.getItem(HOMEKEY)||'{"mode":"pb","custom":""}')}catch{return{mode:'pb',custom:''}}},setHome=v=>localStorage.setItem(HOMEKEY,JSON.stringify(v));
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 let currentView='home';
-function show(v){currentView=v;document.querySelector('.wrap')?.classList.toggle('homeMode',v==='home');['home','homeSettings','day','detail','trip','entry','measure','all','analysis','tackle','sns','instaLearn'].forEach(x=>$(x).style.display=x===v?'block':'none');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));if(v==='home')renderHome();if(v==='trip')renderTrip();if(v==='entry'){
+function show(v){currentView=v;const ai=$('homeAIStyle');if(ai)ai.style.display=v==='home'?'flex':'none';document.querySelector('.wrap')?.classList.toggle('homeMode',v==='home');['home','homeSettings','day','detail','trip','entry','measure','all','analysis','tackle','sns','instaLearn'].forEach(x=>$(x).style.display=x===v?'block':'none');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));if(v==='home')renderHome();if(v==='trip')renderTrip();if(v==='entry'){
   if(returningFromMeasure){
     returningFromMeasure=false;
     restoreEntryDraft(entryDraft);
@@ -470,7 +480,7 @@ function fitHomeHeight(){
 function scheduleHomeFit(){
   requestAnimationFrame(()=>requestAnimationFrame(fitHomeHeight));
 }
-function renderHome(){let all=getR(),now=new Date(),y=now.getFullYear(),mo=now.getMonth(),month=all.filter(r=>{let d=new Date(r.date+'T00:00:00');return d.getFullYear()===y&&d.getMonth()===mo}),year=all.filter(r=>new Date(r.date+'T00:00:00').getFullYear()===y);$('maxMonth').innerHTML=maxCardHTML('今月最大',maxCatch(month));$('maxYear').innerHTML=maxCardHTML('今年最大',maxCatch(year));$('maxAll').innerHTML=maxCardHTML('歴代最大',maxCatch(all));renderCalendar();let trip=getTrip();if(trip){$('tripBanner').style.display='block';$('tripBanner').innerHTML=`<b>🚤 今日の釣行：${esc(trip.publicPlace)}</b><div class="muted">${esc(trip.date)} / ${esc(trip.ride||'')}</div><div class="tripTackles">${(trip.setNames||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>`}else $('tripBanner').style.display='none';scheduleHomeFit()}
+function renderHome(){updateHomeAILearnCount();let all=getR(),now=new Date(),y=now.getFullYear(),mo=now.getMonth(),month=all.filter(r=>{let d=new Date(r.date+'T00:00:00');return d.getFullYear()===y&&d.getMonth()===mo}),year=all.filter(r=>new Date(r.date+'T00:00:00').getFullYear()===y);$('maxMonth').innerHTML=maxCardHTML('今月最大',maxCatch(month));$('maxYear').innerHTML=maxCardHTML('今年最大',maxCatch(year));$('maxAll').innerHTML=maxCardHTML('歴代最大',maxCatch(all));renderCalendar();let trip=getTrip();if(trip){$('tripBanner').style.display='block';$('tripBanner').innerHTML=`<b>🚤 今日の釣行：${esc(trip.publicPlace)}</b><div class="muted">${esc(trip.date)} / ${esc(trip.ride||'')}</div><div class="tripTackles">${(trip.setNames||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>`}else $('tripBanner').style.display='none';scheduleHomeFit()}
 function renderHero(){}
 function renderCalendar(){let y=cur.getFullYear(),m=cur.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),all=getR(),today=new Date();$('mt').textContent=`${y}年 ${m+1}月`;let h='';for(let i=0;i<first;i++)h+='<div class="day empty"></div>';for(let d=1;d<=days;d++){let ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,a=all.filter(x=>x.date===ds),p=catchPhoto(a.find(x=>catchPhoto(x))),td=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;h+=`<button class="day ${a.length?'has':''} ${td?'today':''}" data-date="${ds}"><div class="num">${d}</div>${a.length?`<div class="cnt">🎣 ${a.length}本</div>${p?`<img class="mini" src="${p}">`:''}`:''}</button>`}$('cal').innerHTML=h;document.querySelectorAll('.day[data-date]').forEach(b=>b.onclick=()=>openDay(b.dataset.date))}
 function openDay(date){selectedDate=date;let a=getR().filter(x=>x.date===date);$('dt').textContent=date.replaceAll('-','/');let pub=a[0]?.publicPlace||a[0]?.place||'-';$('daySummary').innerHTML=`<b>📍 ${esc(pub)}</b><div class="muted">${a.length}本 / 最大 ${a.map(x=>x.size).filter(Number.isFinite).length?Math.max(...a.map(x=>x.size).filter(Number.isFinite))+'cm':'-'}</div>`;$('gal').innerHTML=a.length?a.map(x=>`<button class="g" data-id="${x.id}">${catchPhoto(x)?`<img src="${catchPhoto(x)}">`:`<div class="ph">🎣</div>`}<div class="cap"><b>${x.size?x.size+'cm':'サイズ未入力'}</b><div class="muted">${esc(x.lure||'')}</div></div></button>`).join(''):'<div class="card">この日の釣果はありません</div>';document.querySelectorAll('.g').forEach(b=>b.onclick=()=>openDetail(+b.dataset.id));show('day')}
@@ -983,7 +993,11 @@ function getInstaLearnSamples(){
 function setInstaLearnSamples(v){
   localStorage.setItem(INSTA_LEARN_KEY,JSON.stringify(v));
 }
-function renderInstaLearn(){
+function updateHomeAILearnCount(){
+  const e=$('homeAILearnCount');
+  if(e)e.textContent=getInstaLearnSamples().length;
+}
+function renderInstaLearn(){updateHomeAILearnCount();
   const a=getInstaLearnSamples().sort((x,y)=>(y.createdAt||0)-(x.createdAt||0));
   $('learnCount').textContent=a.length;
   $('learnList').innerHTML=a.length?a.map(x=>`
@@ -1047,6 +1061,7 @@ function saveLearnSample(){
 
 $('daySNS').onclick=()=>openSNS(selectedDate);
 $('backSNS').onclick=()=>openDay(currentSNSDate);
+$('homeAIStyle').onclick=()=>openInstaLearn();
 $('openInstaLearn').onclick=()=>openInstaLearn();
 $('backInstaLearn').onclick=()=>{show('sns');drawInsta()};
 $('saveLearnSample').onclick=saveLearnSample;
