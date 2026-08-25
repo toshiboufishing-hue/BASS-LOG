@@ -316,6 +316,12 @@ Chromeのメニューから「アプリをインストール」でも追加で�
   </div>
 
   <div class="card">
+    <h3>✨ 学習した文体プロフィール</h3>
+    <div id="styleProfile" class="learnHint">学習文章を保存すると、ここに文章の特徴を自動分析して表示します。</div>
+    <button id="analyzeStyleBtn" class="btn pri" style="width:100%;margin-top:10px">文体を再分析</button>
+  </div>
+
+  <div class="card">
     <h3>＋ 学習文章を追加</h3>
     <label>投稿文</label>
     <textarea id="learnText" class="snsText" placeholder="過去のInstagram投稿文をそのまま貼り付け"></textarea>
@@ -997,7 +1003,62 @@ function updateHomeAILearnCount(){
   const e=$('homeAILearnCount');
   if(e)e.textContent=getInstaLearnSamples().length;
 }
-function renderInstaLearn(){updateHomeAILearnCount();
+
+function analyzeInstaStyle(){
+  const samples=getInstaLearnSamples();
+  const texts=samples.map(x=>x.text||'').filter(Boolean);
+  if(!texts.length)return null;
+  const joined=texts.join('\n');
+  const chars=texts.reduce((n,t)=>n+t.length,0);
+  const lines=texts.flatMap(t=>t.split(/\n/));
+  const nonempty=lines.filter(x=>x.trim());
+  const emojiMatches=joined.match(/[\p{Extended_Pictographic}\u{1F1E6}-\u{1F1FF}]/gu)||[];
+  const ex=(joined.match(/[!！]/g)||[]).length;
+  const q=(joined.match(/[?？]/g)||[]).length;
+  const lol=(joined.match(/笑|www|ｗｗ|🤣|😂/g)||[]).length;
+  const tags=(joined.match(/#[^\s#]+/g)||[]);
+  const kaomoji=(joined.match(/[☺😊😎👍✨🔥🎣💯]/gu)||[]);
+  const avg=Math.round(chars/texts.length);
+  const avgLines=Math.round(nonempty.length/texts.length*10)/10;
+  const endings={};
+  nonempty.forEach(line=>{
+    const x=line.trim().replace(/[#\s]+$/g,'');
+    const m=x.match(/(.{1,6}[。！!？?✨☺😊👍🤣😂🔥🎣]?)$/);
+    if(m)endings[m[1]]=(endings[m[1]]||0)+1;
+  });
+  const topEnd=Object.entries(endings).sort((a,b)=>b[1]-a[1]).slice(0,5).map(x=>x[0]);
+  const commonEmoji={};
+  kaomoji.forEach(x=>commonEmoji[x]=(commonEmoji[x]||0)+1);
+  const topEmoji=Object.entries(commonEmoji).sort((a,b)=>b[1]-a[1]).slice(0,6).map(x=>x[0]);
+  return {
+    sampleCount:texts.length,avgChars:avg,avgLines,
+    emojiPerPost:Math.round(emojiMatches.length/texts.length*10)/10,
+    excitementPerPost:Math.round(ex/texts.length*10)/10,
+    questionPerPost:Math.round(q/texts.length*10)/10,
+    humorPerPost:Math.round(lol/texts.length*10)/10,
+    hashtagPerPost:Math.round(tags.length/texts.length*10)/10,
+    topEmoji,topEnd
+  };
+}
+function renderStyleProfile(){
+  const el=$('styleProfile'); if(!el)return;
+  const p=analyzeInstaStyle();
+  if(!p){el.innerHTML='学習文章を保存すると、ここに文章の特徴を自動分析して表示します。';return}
+  const length=p.avgChars<180?'短め':p.avgChars<400?'標準':'長め';
+  const emoji=p.emojiPerPost<1?'少なめ':p.emojiPerPost<5?'ほどよく使う':'多め';
+  const humor=p.humorPerPost>0.5?'ユーモア表現をよく使う':'ユーモア表現は控えめ';
+  el.innerHTML=`
+    <strong>${p.sampleCount}件から分析中</strong><br>
+    ・投稿の長さ：${length}（平均 ${p.avgChars}文字）<br>
+    ・改行量：平均 ${p.avgLines}行<br>
+    ・絵文字：${emoji}（平均 ${p.emojiPerPost}個/投稿）<br>
+    ・感嘆符：平均 ${p.excitementPerPost}個/投稿<br>
+    ・ハッシュタグ：平均 ${p.hashtagPerPost}個/投稿<br>
+    ・雰囲気：${humor}<br>
+    ${p.topEmoji.length?'・よく使う絵文字：'+p.topEmoji.join(' ')+'<br>':''}
+    <span class="note">※現在は端末内で文章の癖を分析。AI生成時には保存した原文そのものもお手本として使います。</span>`;
+}
+function renderInstaLearn(){updateHomeAILearnCount();renderStyleProfile();
   const a=getInstaLearnSamples().sort((x,y)=>(y.createdAt||0)-(x.createdAt||0));
   $('learnCount').textContent=a.length;
   $('learnList').innerHTML=a.length?a.map(x=>`
@@ -1065,6 +1126,7 @@ $('homeAIStyle').onclick=()=>openInstaLearn();
 $('openInstaLearn').onclick=()=>openInstaLearn();
 $('backInstaLearn').onclick=()=>{show('sns');drawInsta()};
 $('saveLearnSample').onclick=saveLearnSample;
+$('analyzeStyleBtn').onclick=renderStyleProfile;
 $('saveCurrentAsLearn').onclick=()=>{
   const t=$('snsText').value.trim();
   if(!t){alert('保存する文章がありません。');return}
