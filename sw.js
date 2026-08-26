@@ -1,4 +1,4 @@
-const CACHE='basslog-v10-6-home-card-drag-20260826';
+const CACHE='basslog-v10-6-home-card-drag-mobile-fix-20260826';
 const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
