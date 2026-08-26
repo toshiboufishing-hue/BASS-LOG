@@ -292,7 +292,7 @@ Chromeのメニューから「アプリをインストール」でも追加で�
 
 <section id="tackle" style="display:none"><div class="card"><h3>🎣 ロッド</h3><div class="regRow"><input id="newRod" placeholder="ロッド名"><button id="addRod" class="btn pri">追加</button></div><div id="rodList"></div></div><div class="card"><h3>⚙️ リール</h3><div class="note" style="margin-bottom:10px">主要3メーカーの2000年代後半〜2026年モデルを、新しい順で候補から登録できます。主要モデルはメーカー資料を優先して見直しています。候補に無い機種は従来どおり手入力できます。</div><div class="grid"><div><label>メーカー</label><select id="reelMaker"><option value="">選択</option><option>SHIMANO</option><option>DAIWA</option><option>Abu Garcia</option></select></div><div><label>モデル</label><select id="reelModel"><option value="">メーカーを選択</option></select></div><div><label>ギヤ比</label><select id="reelGear"><option value="">モデルを選択</option></select></div><div><label>ハンドル</label><select id="reelHand"><option value="">指定なし</option><option>RIGHT</option><option>LEFT</option></select></div></div><button id="addReelCatalog" class="btn pri" style="width:100%;margin:10px 0 12px">候補からリール登録</button><div class="regRow"><input id="newReel" placeholder="候補に無いリール名を手入力"><button id="addReel" class="btn sec">手動追加</button></div><div id="reelList"></div></div><div class="card"><h3>⭐ タックルセット</h3><div class="grid"><div class="full"><label>セット名</label><input id="newSetName" placeholder="例：MH巻物"></div><div><label>ロッド</label><select id="newSetRod"></select></div><div><label>リール</label><select id="newSetReel"></select></div><div><label>ライン</label><select id="newSetLineType"><option>フロロ</option><option>ナイロン</option><option>カーボナイロン</option><option>PE</option></select></div><div><label id="newSetSizeLabel">lb</label><select id="newSetLb"></select></div></div><button id="addSet" class="btn pri" style="width:100%;margin-top:10px">セット登録</button><div id="setList"></div></div></section>
 
-<section id="sns" style="display:none"><button id="backSNS" class="btn sec">← 日別一覧</button><div class="card"><h3>📸 Instagram投稿素材</h3><div id="snsPrivacy" class="note privacy"></div><textarea id="snsText" class="snsText"></textarea><div class="note">※これはオフラインで作る投稿素材。AI文体生成はオンライン連携版で追加予定。</div>
+<section id="sns" style="display:none"><button id="backSNS" class="btn sec">← 日別一覧</button><div class="card"><h3>📸 Instagram投稿素材</h3><div id="snsPrivacy" class="note privacy"></div><textarea id="snsText" class="snsText"></textarea><div class="card" style="margin-top:10px"><h3>✨ AI POST</h3><div class="note">当日の投稿素材と保存済み文体サンプルをAI生成用データにまとめます。</div><button id="buildAIPost" class="btn pri" style="width:100%;margin-top:10px">AI投稿データを作成</button><div id="aiPostStatus" class="note" style="margin-top:8px"></div><textarea id="aiPromptPreview" class="snsText" style="display:none;margin-top:10px" readonly></textarea><button id="copyAIPrompt" class="btn sec" style="display:none;width:100%;margin-top:8px">コピー</button></div>
 <div class="grid" style="margin-top:10px">
   <button id="saveCurrentAsLearn" class="btn sec">🧠 この文章を学習用に保存</button>
   <button id="openInstaLearn" class="btn pri">✨ 文体学習ライブラリ</button>
@@ -990,6 +990,17 @@ $('addRod').onclick=()=>{let v=$('newRod').value.trim();if(!v)return;let t=getT(
 
 
 const INSTA_LEARN_KEY='basslog_insta_style_samples_v1';
+function buildAIPostPackage(){
+ const samples=getInstaLearnSamples().slice(-12), profile=analyzeInstaStyle();
+ const base=$('snsText')?$('snsText').value.trim():'', date=currentSNSDate||selectedDate||'';
+ const examples=samples.map((x,i)=>'【文体サンプル'+(i+1)+'】\\n'+x.text).join('\\n\\n');
+ const prof=profile?('平均文字数:'+profile.avgChars+' / 平均改行:'+profile.avgLines+'行 / 絵文字:'+profile.emojiPerPost+'個/投稿 / 感嘆符:'+profile.excitementPerPost+'個/投稿 / ハッシュタグ:'+profile.hashtagPerPost+'個/投稿 / よく使う絵文字:'+profile.topEmoji.join(' ')):'分析なし';
+ return 'バスフィッシングのInstagram投稿文を作成してください。\\n当日の記録にある事実だけを使い、存在しない情報を創作しないでください。\\n文体サンプルの言い回し・改行・絵文字・テンポを参考にし、過去サンプルの釣果事実は今回へ混ぜないでください。\\n\\n【対象日】\\n'+date+'\\n\\n【文体プロフィール】\\n'+prof+'\\n\\n【当日の記録】\\n'+base+'\\n\\n'+examples+'\\n\\n【出力】\\nInstagramへそのまま貼れる完成文章だけを出力してください。';
+}
+function prepareAIPost(){
+ const x=buildAIPostPackage();$('aiPromptPreview').value=x;$('aiPromptPreview').style.display='block';$('copyAIPrompt').style.display='block';$('aiPostStatus').textContent='準備完了：学習サンプル '+getInstaLearnSamples().length+'件を使用';
+}
+
 function getInstaLearnSamples(){
   try{
     const v=JSON.parse(localStorage.getItem(INSTA_LEARN_KEY)||'[]');
@@ -1127,7 +1138,7 @@ $('openInstaLearn').onclick=()=>openInstaLearn();
 $('backInstaLearn').onclick=()=>{show('sns');drawInsta()};
 $('saveLearnSample').onclick=saveLearnSample;
 $('analyzeStyleBtn').onclick=renderStyleProfile;
-$('saveCurrentAsLearn').onclick=()=>{
+$('buildAIPost').onclick=prepareAIPost;$('copyAIPrompt').onclick=async()=>{const t=$('aiPromptPreview').value;try{await navigator.clipboard.writeText(t)}catch(e){$('aiPromptPreview').select();document.execCommand('copy')}$('aiPostStatus').textContent='コピーしました。';};$('saveCurrentAsLearn').onclick=()=>{
   const t=$('snsText').value.trim();
   if(!t){alert('保存する文章がありません。');return}
   $('learnText').value=t;
