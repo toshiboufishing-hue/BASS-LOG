@@ -560,8 +560,8 @@ function refreshPlaceDatalist(){const d=document.getElementById('savedPrivatePla
 const WATER_LEVELS=['超クリア','クリア','ステイン','マッディ','強マッディ'];
 function waterDiffLabel(normal,current){const a=WATER_LEVELS.indexOf(normal),b=WATER_LEVELS.indexOf(current);if(a<0||b<0)return '';const d=b-a;if(d===0)return '平常と同じ';if(d===1)return '平常より1段階濁り';if(d>=2)return `平常より${d}段階濁り`;if(d===-1)return '平常より1段階クリア';return `平常より${Math.abs(d)}段階クリア`}
 function updatePlaceWaterHint(){const h=document.getElementById('placeWaterHint');if(!h)return;const d=placeDef(document.getElementById('place')?.value),cur=document.getElementById('waterColor')?.value||'';h.textContent=d?.normalWaterColor?`平常水色：${d.normalWaterColor}${cur?' / '+waterDiffLabel(d.normalWaterColor,cur):''}`:''}
-refreshPlaceDatalist();
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+refreshPlaceDatalist();
 let currentView='home';
 function show(v){currentView=v;const ai=$('homeAIStyle');if(ai)ai.style.display=(v==='home'&&getAIOption()!=='off')?'flex':'none';document.querySelector('.wrap')?.classList.toggle('homeMode',v==='home');['home','homeSettings','day','detail','trip','entry','measure','all','analysis','tackle','sns','instaLearn'].forEach(x=>$(x).style.display=x===v?'block':'none');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));if(v==='home')renderHome();if(v==='trip')renderTrip();if(v==='entry'){
   if(returningFromMeasure){
