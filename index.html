@@ -329,10 +329,14 @@ Chromeのメニューから「アプリをインストール」でも追加で�
 <section id="all" style="display:none"><div class="grid" style="margin-bottom:8px"><button id="openAnalysis" class="btn pri">📊 自分の釣果を分析</button><button id="clearSearch" class="btn sec">検索クリア</button></div><div class="card"><input id="search" placeholder="場所・タックル・ルアーで検索"></div><div id="allList"></div></section>
 <section id="analysis" style="display:none">
 <button id="backAnalysis" class="btn sec">← 一覧</button>
+<div class="card" style="border-color:rgba(167,241,36,.28)">
+  <b>🔒 この分析は自分専用</b>
+  <div class="muted" style="margin-top:5px">場所は公開用名称ではなく、釣果に保存した「自分の場所」で集計します。</div>
+</div>
 <div class="card">
-  <div class="analysisSectionTitle"><h3>🔎 自分の釣果を絞り込み</h3><span id="analysisFilterCount" class="note"></span></div>
+  <div class="analysisSectionTitle"><h3>🔒 自分専用の釣果分析</h3><span id="analysisFilterCount" class="note"></span></div>
   <div class="analysisFilters">
-    <div><label>場所</label><select id="anPlace"><option value="">すべて</option></select></div>
+    <div><label>📍 自分の場所</label><select id="anPlace"><option value="">すべて</option></select><div class="note">分析専用・公開名は使いません</div></div>
     <div><label>ルアー</label><select id="anLure"><option value="">すべて</option></select></div>
     <div><label>リグ</label><select id="anRig"><option value="">すべて</option></select></div>
     <div><label>天気</label><select id="anWeather"><option value="">すべて</option></select></div>
@@ -1058,10 +1062,10 @@ function analysisWaterBucket(v){v=Number(v);if(!Number.isFinite(v))return '';if(
 function analysisWaterLabel(k){return ({lt15:'15℃未満','15-20':'15〜20℃','20-25':'20〜25℃','25-30':'25〜30℃','30+':'30℃以上'})[k]||'水温未記録'}
 function analysisUnique(field,mapper){const vals=getR().map(x=>mapper?mapper(x):(x[field]||'')).filter(Boolean);return [...new Set(vals)].sort((a,b)=>String(a).localeCompare(String(b),'ja'))}
 function fillAnalysisSelect(id,values){const el=$(id),cur=el.value;el.innerHTML='<option value="">すべて</option>'+values.map(v=>`<option value="${esc(v)}">${esc(v)}</option>`).join('');if(values.includes(cur))el.value=cur}
-function analysisFiltered(){let a=getR();const p=$('anPlace').value,l=$('anLure').value,r=$('anRig').value,w=$('anWeather').value,t=$('anTime').value,wt=$('anWater').value,td=$('anTide').value;return a.filter(x=>(!p||(x.publicPlace||x.place||'')===p)&&(!l||(x.lure||'')===l)&&(!r||(x.rig||'')===r)&&(!w||(x.weather||'')===w)&&(!t||analysisTimeBucket(x.catchTime)===t)&&(!wt||analysisWaterBucket(x.waterTemp)===wt)&&(!td||(x.tide||'')===td))}
+function analysisFiltered(){let a=getR();const p=$('anPlace').value,l=$('anLure').value,r=$('anRig').value,w=$('anWeather').value,t=$('anTime').value,wt=$('anWater').value,td=$('anTide').value;return a.filter(x=>(!p||(x.place||'')===p)&&(!l||(x.lure||'')===l)&&(!r||(x.rig||'')===r)&&(!w||(x.weather||'')===w)&&(!t||analysisTimeBucket(x.catchTime)===t)&&(!wt||analysisWaterBucket(x.waterTemp)===wt)&&(!td||(x.tide||'')===td))}
 function renderAnalysisBars(id,map,labelFn){const el=$(id),entries=Object.entries(map).sort((a,b)=>b[1]-a[1]);if(!entries.length){el.innerHTML='<div class="analysisEmpty">データなし</div>';return}const max=entries[0][1]||1;el.innerHTML=entries.map(([k,v])=>`<div class="analysisBar"><div class="analysisBarName">${esc(labelFn?labelFn(k):k)}</div><div class="analysisBarTrack"><div class="analysisBarFill" style="width:${Math.max(4,Math.round(v/max*100))}%"></div></div><div class="analysisBarValue">${v}本</div></div>`).join('')}
 function renderAnalysis(){
-  fillAnalysisSelect('anPlace',analysisUnique(null,x=>x.publicPlace||x.place||''));
+  fillAnalysisSelect('anPlace',analysisUnique(null,x=>x.place||''));
   fillAnalysisSelect('anLure',analysisUnique('lure'));
   fillAnalysisSelect('anRig',analysisUnique('rig'));
   fillAnalysisSelect('anWeather',analysisUnique('weather'));
@@ -1069,10 +1073,10 @@ function renderAnalysis(){
   $('analysisFilterCount').textContent=`${a.length} / ${all.length}本`;
   $('total').textContent=a.length;$('maxAll').textContent=sizes.length?Math.max(...sizes)+'cm':'-';$('avgAll').textContent=sizes.length?(sizes.reduce((p,c)=>p+c,0)/sizes.length).toFixed(1)+'cm':'-';$('daysAll').textContent=new Set(a.map(x=>x.date).filter(Boolean)).size;
   const maps={time:{},weather:{},water:{},tide:{},rig:{},lure:{},place:{}};
-  a.forEach(x=>{const tb=analysisTimeBucket(x.catchTime);if(tb)maps.time[tb]=(maps.time[tb]||0)+1;if(x.weather)maps.weather[x.weather]=(maps.weather[x.weather]||0)+1;const wb=analysisWaterBucket(x.waterTemp);if(wb)maps.water[wb]=(maps.water[wb]||0)+1;if(x.tide)maps.tide[x.tide]=(maps.tide[x.tide]||0)+1;if(x.rig)maps.rig[x.rig]=(maps.rig[x.rig]||0)+1;if(x.lure)maps.lure[x.lure]=(maps.lure[x.lure]||0)+1;const p=x.publicPlace||x.place;if(p)maps.place[p]=(maps.place[p]||0)+1});
+  a.forEach(x=>{const tb=analysisTimeBucket(x.catchTime);if(tb)maps.time[tb]=(maps.time[tb]||0)+1;if(x.weather)maps.weather[x.weather]=(maps.weather[x.weather]||0)+1;const wb=analysisWaterBucket(x.waterTemp);if(wb)maps.water[wb]=(maps.water[wb]||0)+1;if(x.tide)maps.tide[x.tide]=(maps.tide[x.tide]||0)+1;if(x.rig)maps.rig[x.rig]=(maps.rig[x.rig]||0)+1;if(x.lure)maps.lure[x.lure]=(maps.lure[x.lure]||0)+1;const p=x.place||'';if(p)maps.place[p]=(maps.place[p]||0)+1});
   renderAnalysisBars('timeRank',maps.time,analysisTimeLabel);renderAnalysisBars('weatherRank',maps.weather);renderAnalysisBars('waterRank',maps.water,analysisWaterLabel);renderAnalysisBars('tideRank',maps.tide);renderAnalysisBars('rigRank',maps.rig);renderAnalysisBars('lureRank',maps.lure);renderAnalysisBars('placeRank',maps.place);
   const ranked=a.filter(x=>Number.isFinite(Number(x.size))).sort((x,y)=>Number(y.size)-Number(x.size)).slice(0,10);
-  $('ranking').innerHTML=ranked.length?ranked.map((x,i)=>`<div class="item"><b>${i+1}. ${Number(x.size)}cm</b> ${esc(x.publicPlace||x.place||'')}<div class="muted">${esc(x.date||'')} ${esc(x.catchTime||'')} / ${esc(x.lure||'')} ${x.rig?' / '+esc(x.rig):''}</div></div>`).join(''):'<div class="analysisEmpty">データなし</div>';
+  $('ranking').innerHTML=ranked.length?ranked.map((x,i)=>`<div class="item"><b>${i+1}. ${Number(x.size)}cm</b> ${esc(x.place||'')}<div class="muted">${esc(x.date||'')} ${esc(x.catchTime||'')} / ${esc(x.lure||'')} ${x.rig?' / '+esc(x.rig):''}</div></div>`).join(''):'<div class="analysisEmpty">データなし</div>';
 }
 
 function refreshReelModels(){let m=$('reelMaker').value,a=(REEL_DB[m]||[]).slice().sort((a,b)=>Number(b[0])-Number(a[0])||a[1].localeCompare(b[1],'ja'));$('reelModel').innerHTML='<option value="">モデルを選択</option>'+a.map((x,i)=>`<option value="${i}">${x[0]} ${esc(x[1])}</option>`).join('');$('reelGear').innerHTML='<option value="">モデルを選択</option>'}

@@ -1,4 +1,4 @@
-const CACHE='basslog-v10-6-analysis-stage1-20260826';
+const CACHE='basslog-v10-6-analysis-private-place-20260826';
 const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
