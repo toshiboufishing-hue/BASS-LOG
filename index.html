@@ -1272,7 +1272,8 @@ backdrop-filter:blur(10px);padding:0}
 .blSetName{font-weight:800}.blSetDesc{font-size:12px;color:rgba(255,255,255,.62);margin-top:4px}
 .blSwitch{position:relative;width:52px;height:30px;flex:0 0 auto}.blSwitch input{display:none}.blSlider{position:absolute;inset:0;border-radius:99px;background:#31413c;transition:.18s}.blSlider:before{content:"";position:absolute;width:24px;height:24px;left:3px;top:3px;border-radius:50%;background:#fff;transition:.18s}.blSwitch input:checked+.blSlider{background:#8df000}.blSwitch input:checked+.blSlider:before{transform:translateX(22px)}
 #blAiDetail{display:none;padding:4px 0 2px;color:#b8c8c1;font-size:13px}#blAiDetail.show{display:block}
-.blSetSelect{min-width:150px;max-width:190px;background:#0b2a21;color:#fff;border:1px solid rgba(150,255,40,.30);border-radius:10px;padding:9px 10px;font-weight:700;outline:none}.blSetSection{padding-top:4px}.blSetSectionTitle{font-size:12px;font-weight:900;color:#9db0a8;letter-spacing:.08em;margin-top:8px}
+.blSetSelect{min-width:150px;max-width:190px;background:#0b2a21;color:#fff;border:1px solid rgba(150,255,40,.30);border-radius:10px;padding:9px 10px;font-weight:700;outline:none}.blSetSection{padding-top:4px}
+.blCardOrderWrap{padding:14px 0 4px;border-top:1px solid rgba(255,255,255,.10)}.blCardOrderHead{margin-bottom:12px}.blCardOrderGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.blOrderCard{position:relative;aspect-ratio:4/5;border:1px solid rgba(154,234,24,.42);border-radius:15px;overflow:hidden;background:linear-gradient(145deg,#173f35,#0d251f);touch-action:none;user-select:none;box-shadow:0 7px 18px rgba(0,0,0,.22);transition:transform .14s,opacity .14s,box-shadow .14s}.blOrderCard img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;pointer-events:none}.blOrderCard:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,.05),rgba(0,0,0,.74));pointer-events:none}.blOrderCardText{position:absolute;z-index:2;left:8px;right:7px;bottom:8px;pointer-events:none}.blOrderCardLabel{font-size:10px;font-weight:850}.blOrderCardSize{font-size:20px;font-weight:950;line-height:1.05}.blDragHandle{position:absolute;z-index:3;right:6px;top:6px;width:27px;height:27px;border-radius:9px;background:rgba(3,24,18,.78);border:1px solid rgba(255,255,255,.28);display:grid;place-items:center;font-size:16px;font-weight:900;pointer-events:none}.blOrderCard.dragging{opacity:.52;transform:scale(.96);box-shadow:0 0 0 2px #8df000}.blOrderCard.dragover{box-shadow:0 0 0 2px #8df000,0 0 18px rgba(141,240,0,.3)}.blSetSectionTitle{font-size:12px;font-weight:900;color:#9db0a8;letter-spacing:.08em;margin-top:8px}
 </style>
 
 <div id="blSettingsOverlay" aria-hidden="true">
@@ -1285,32 +1286,39 @@ backdrop-filter:blur(10px);padding:0}
     <div id="blAiDetail">AI STYLEなどのAI関連機能を有効化する設定です。AIサービスとの接続は次の段階で追加します。</div>
     <div class="blSetSection">
       <div class="blSetSectionTitle">ホーム</div>
-      <div class="blSetRow">
-        <div><div class="blSetName">最大魚カードの順番</div><div class="blSetDesc">上の3枚だけ、好きな並びに変更できます</div></div>
-        <select id="blHomeCardOrder" class="blSetSelect">
-          <option value="month,year,all">今月 → 今年 → 歴代</option>
-          <option value="month,all,year">今月 → 歴代 → 今年</option>
-          <option value="year,month,all">今年 → 今月 → 歴代</option>
-          <option value="year,all,month">今年 → 歴代 → 今月</option>
-          <option value="all,month,year">歴代 → 今月 → 今年</option>
-          <option value="all,year,month">歴代 → 今年 → 今月</option>
-        </select>
+      <div class="blCardOrderWrap">
+        <div class="blCardOrderHead"><div class="blSetName">最大魚カードの順番</div><div class="blSetDesc">カードを長押しして左右にドラッグ</div></div>
+        <div id="blHomeCardOrderGrid" class="blCardOrderGrid" aria-label="最大魚カード並び替え"></div>
       </div>
     </div>
   </section>
 </div>
 <script id="basslog-settings-stage1-js">
 (()=>{
- const KEY='basslog_ai_enabled';
+ const KEY='basslog_ai_enabled', CARD_KEY='basslog_home_card_order_v1';
  const btn=document.getElementById('blSettingsBtn'), ov=document.getElementById('blSettingsOverlay');
- const close=document.getElementById('blSettingsClose'), ai=document.getElementById('blAiEnabled'), detail=document.getElementById('blAiDetail'), cardOrder=document.getElementById('blHomeCardOrder');
- const CARD_KEY='basslog_home_card_order_v1';
- const load=()=>{const on=localStorage.getItem(KEY)==='1';ai.checked=on;detail.classList.toggle('show',on);document.documentElement.dataset.aiEnabled=on?'1':'0';if(cardOrder)cardOrder.value=localStorage.getItem(CARD_KEY)||'month,year,all';};
+ const close=document.getElementById('blSettingsClose'), ai=document.getElementById('blAiEnabled'), detail=document.getElementById('blAiDetail'), grid=document.getElementById('blHomeCardOrderGrid');
+ const validOrder=()=>{let a=(localStorage.getItem(CARD_KEY)||'month,year,all').split(',').filter(x=>['month','year','all'].includes(x));return a.length===3&&new Set(a).size===3?a:['month','year','all']};
+ const sourceFor=k=>({month:document.getElementById('maxMonth'),year:document.getElementById('maxYear'),all:document.getElementById('maxAll')})[k];
+ const fallback={month:['今月最大','-- cm'],year:['今年最大','-- cm'],all:['歴代最大','-- cm']};
+ function renderOrderCards(){if(!grid)return;grid.innerHTML='';validOrder().forEach(k=>{const src=sourceFor(k), card=document.createElement('div');card.className='blOrderCard';card.dataset.key=k;card.draggable=true;let img=src?.querySelector('img')?.getAttribute('src')||'',label=src?.querySelector('.maxCardLabel')?.textContent||fallback[k][0],size=src?.querySelector('.maxCardSize')?.textContent||fallback[k][1];card.innerHTML=`${img?`<img src="${img}" alt="">`:''}<span class="blDragHandle">≡</span><div class="blOrderCardText"><div class="blOrderCardLabel">${label}</div><div class="blOrderCardSize">${size}</div></div>`;grid.appendChild(card)});bindDrag()}
+ function saveGrid(){const order=[...grid.children].map(x=>x.dataset.key);localStorage.setItem(CARD_KEY,order.join(','));window.dispatchEvent(new CustomEvent('basslog-home-card-order-change'));}
+ let drag=null;
+ function moveAt(x){if(!drag)return;const cards=[...grid.children].filter(c=>c!==drag);let before=cards.find(c=>x<c.getBoundingClientRect().left+c.getBoundingClientRect().width/2);if(before)grid.insertBefore(drag,before);else grid.appendChild(drag)}
+ function bindDrag(){[...grid.children].forEach(card=>{
+   card.addEventListener('dragstart',e=>{drag=card;card.classList.add('dragging');e.dataTransfer.effectAllowed='move'});
+   card.addEventListener('dragend',()=>{card.classList.remove('dragging');[...grid.children].forEach(c=>c.classList.remove('dragover'));drag=null;saveGrid()});
+   card.addEventListener('dragover',e=>{e.preventDefault();moveAt(e.clientX)});
+   card.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;drag=card;card.classList.add('dragging');card.setPointerCapture?.(e.pointerId)});
+   card.addEventListener('pointermove',e=>{if(drag===card){e.preventDefault();moveAt(e.clientX)}});
+   const end=()=>{if(drag===card){card.classList.remove('dragging');drag=null;saveGrid()}};card.addEventListener('pointerup',end);card.addEventListener('pointercancel',end);
+ })}
+ const load=()=>{const on=localStorage.getItem(KEY)==='1';ai.checked=on;detail.classList.toggle('show',on);document.documentElement.dataset.aiEnabled=on?'1':'0';renderOrderCards()};
  btn.onclick=()=>{load();ov.classList.add('open');ov.setAttribute('aria-hidden','false')};
  const shut=()=>{ov.classList.remove('open');ov.setAttribute('aria-hidden','true')};
- close.onclick=shut; ov.addEventListener('click',e=>{if(e.target===ov)shut()});
- ai.onchange=()=>{localStorage.setItem(KEY,ai.checked?'1':'0');load();window.dispatchEvent(new CustomEvent('basslog-ai-setting-change',{detail:{enabled:ai.checked}}));};
- if(cardOrder)cardOrder.onchange=()=>{localStorage.setItem(CARD_KEY,cardOrder.value);window.dispatchEvent(new CustomEvent('basslog-home-card-order-change'));};
+ close.onclick=shut;ov.addEventListener('click',e=>{if(e.target===ov)shut()});
+ ai.onchange=()=>{localStorage.setItem(KEY,ai.checked?'1':'0');load();window.dispatchEvent(new CustomEvent('basslog-ai-setting-change',{detail:{enabled:ai.checked}}))};
+ window.addEventListener('basslog-home-card-order-change',()=>{if(ov.classList.contains('open'))renderOrderCards()});
  load();
 })();
 </script>
