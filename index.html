@@ -198,7 +198,7 @@ align-items:center;justify-content:center;background:#a7f124;color:#0a1c16;font-
 
 
 .blOrderCard{appearance:none;-webkit-appearance:none;padding:0;text-align:left;cursor:pointer;touch-action:manipulation;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
-.blOrderCard.isSelected{border:2px solid #9cff00!important;box-shadow:0 0 0 2px rgba(156,255,0,.22),0 0 18px rgba(156,255,0,.28);transform:translateY(-2px)}
+.blOrderCard.isSelected{border:3px solid #9cff00!important;box-shadow:0 0 0 3px rgba(156,255,0,.24),0 0 22px rgba(156,255,0,.38);transform:translateY(-3px);filter:brightness(1.12)}
 .blOrderCard.isSelected::after{content:"交換先をタップ";position:absolute;left:6px;right:6px;top:6px;padding:4px 3px;border-radius:7px;background:rgba(10,35,22,.88);color:#b7ff43;font-size:10px;font-weight:900;text-align:center;z-index:6}
 
 </style>
@@ -1334,7 +1334,7 @@ backdrop-filter:blur(10px);padding:0}
        if(a>=0&&b>=0){
          [order[a],order[b]]=[order[b],order[a]];
          localStorage.setItem(CARD_KEY,order.join(','));
-         applyHomeOrder();
+         window.dispatchEvent(new CustomEvent('basslog-home-card-order-change'));
        }
        selectedOrderKey=null;
        renderOrderCards();
