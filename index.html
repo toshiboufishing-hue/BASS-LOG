@@ -219,6 +219,14 @@ align-items:center;justify-content:center;background:#a7f124;color:#0a1c16;font-
 .analysisEmpty{padding:12px 0;color:var(--muted);font-size:12px}
 .analysisActive{border-color:rgba(167,241,36,.55)!important;box-shadow:0 0 0 1px rgba(167,241,36,.12)}
 
+
+.btn.sec{color:#17310b!important;font-weight:850}
+.nowGrid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.nowResult{border:1px solid var(--line);border-radius:18px;padding:12px;margin-top:9px}
+.nowMatch{font-size:22px;font-weight:950;color:var(--a2)}
+.nowTags{display:flex;flex-wrap:wrap;gap:6px;margin-top:7px}
+.nowTag{font-size:11px;padding:4px 7px;border-radius:999px;border:1px solid rgba(167,241,36,.28)}
+.nowTop{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center}
 </style>
 </head><body><button id="homeAIStyle" class="aiStyleHome" type="button">🧠 AI STYLE <span id="homeAILearnCount" class="aiCount">0</span></button>
 <div class="wrap">
@@ -328,7 +336,7 @@ Chromeのメニューから「アプリをインストール」でも追加で�
 
 <section id="all" style="display:none"><div class="grid" style="margin-bottom:8px"><button id="openAnalysis" class="btn pri">📊 自分の釣果を分析</button><button id="clearSearch" class="btn sec">検索クリア</button></div><div class="card"><input id="search" placeholder="場所・タックル・ルアーで検索"></div><div id="allList"></div></section>
 <section id="analysis" style="display:none">
-<button id="backAnalysis" class="btn sec">← 一覧</button>
+<div class="grid" style="margin-bottom:8px"><button id="backAnalysis" class="btn sec">← 一覧</button><button id="openNow" class="btn pri">⚡ NOW 逆引き</button></div>
 <div class="card" style="border-color:rgba(167,241,36,.28)">
   <b>🔒 この分析は自分専用</b>
   <div class="muted" style="margin-top:5px">場所は公開用名称ではなく、釣果に保存した「自分の場所」で集計します。</div>
@@ -360,7 +368,19 @@ Chromeのメニューから「アプリをインストール」でも追加で�
 <div class="card"><h3>🪱 ルアー別</h3><div id="lureRank"></div></div>
 <div class="card"><h3>📍 場所別</h3><div id="placeRank"></div></div>
 <div class="card"><h3>🏆 最大魚ランキング</h3><div id="ranking"></div></div>
-</section>
+<div id="nowPanel" style="display:none">
+<div class="card analysisActive"><h3>⚡ NOW — 今の状況から逆引き</h3><div class="muted">過去の自分の釣果だけから、現在条件に近い実績を探します。</div>
+<div class="nowGrid" style="margin-top:10px">
+<div><label>📍 自分の場所</label><select id="nowPlace"><option value="">指定なし</option></select></div>
+<div><label>☁️ 天気</label><select id="nowWeather"><option value="">指定なし</option></select></div>
+<div><label>🕐 現在時刻</label><input id="nowTime" type="time"></div>
+<div><label>🌡️ 水温 ℃</label><input id="nowWater" type="number" step="0.1"></div>
+<div><label>🌊 潮回り</label><select id="nowTide"><option value="">指定なし</option><option>大潮</option><option>中潮</option><option>小潮</option><option>長潮</option><option>若潮</option></select></div>
+<div style="align-self:end"><button id="runNow" class="btn pri" style="width:100%">過去の自分を検索</button></div>
+</div></div>
+<div class="card"><h3>🎣 類似した過去の釣果 <span id="nowCount" class="note"></span></h3><div id="nowResults"><div class="analysisEmpty">条件を入れて検索してください</div></div></div>
+<div class="card"><h3>💡 この状況で実績のあるルアー</h3><div id="nowLureSummary"><div class="analysisEmpty">検索後に表示します</div></div></div>
+</div></section>
 
 <section id="tackle" style="display:none"><div class="card"><h3>🎣 ロッド</h3><div class="regRow"><input id="newRod" placeholder="ロッド名"><button id="addRod" class="btn pri">追加</button></div><div id="rodList"></div></div><div class="card"><h3>⚙️ リール</h3><div class="note" style="margin-bottom:10px">主要3メーカーの2000年代後半〜2026年モデルを、新しい順で候補から登録できます。主要モデルはメーカー資料を優先して見直しています。候補に無い機種は従来どおり手入力できます。</div><div class="grid"><div><label>メーカー</label><select id="reelMaker"><option value="">選択</option><option>SHIMANO</option><option>DAIWA</option><option>Abu Garcia</option></select></div><div><label>モデル</label><select id="reelModel"><option value="">メーカーを選択</option></select></div><div><label>ギヤ比</label><select id="reelGear"><option value="">モデルを選択</option></select></div><div><label>ハンドル</label><select id="reelHand"><option value="">指定なし</option><option>RIGHT</option><option>LEFT</option></select></div></div><button id="addReelCatalog" class="btn pri" style="width:100%;margin:10px 0 12px">候補からリール登録</button><div class="regRow"><input id="newReel" placeholder="候補に無いリール名を手入力"><button id="addReel" class="btn sec">手動追加</button></div><div id="reelList"></div></div><div class="card"><h3>⭐ タックルセット</h3><div class="grid"><div class="full"><label>セット名</label><input id="newSetName" placeholder="例：MH巻物"></div><div><label>ロッド</label><select id="newSetRod"></select></div><div><label>リール</label><select id="newSetReel"></select></div><div><label>ライン</label><select id="newSetLineType"><option>フロロ</option><option>ナイロン</option><option>カーボナイロン</option><option>PE</option></select></div><div><label id="newSetSizeLabel">lb</label><select id="newSetLb"></select></div></div><button id="addSet" class="btn pri" style="width:100%;margin-top:10px">セット登録</button><div id="setList"></div></div></section>
 
@@ -1051,7 +1071,7 @@ $('applyMeasure').onclick=()=>{
   show('entry');
 };
 
-function renderAll(){let q=$('search').value.toLowerCase(),a=getR().filter(x=>Object.values(x).join(' ').toLowerCase().includes(q));$('allList').innerHTML=a.map(x=>`<div class="card item" data-id="${x.id}"><b>${esc(x.date)} ${esc(x.publicPlace||x.place)} ${x.size?x.size+'cm':''}</b><div class="muted">${esc(x.rod||x.tackle||'')} / ${esc(x.reel||'')} / ${esc(x.lure||'')}</div></div>`).join('')||'<div class="card">データなし</div>';document.querySelectorAll('.item[data-id]').forEach(b=>b.onclick=()=>{let x=getR().find(r=>r.id===+b.dataset.id);selectedDate=x?.date||'';openDetail(+b.dataset.id)})}$('search').oninput=renderAll;$('openAnalysis').onclick=()=>show('analysis');$('backAnalysis').onclick=()=>show('all');$('clearSearch').onclick=()=>{$('search').value='';renderAll()};['anPlace','anLure','anRig','anWeather','anTime','anWater','anTide'].forEach(id=>$(id).onchange=renderAnalysis);$('resetAnalysisFilters').onclick=()=>{['anPlace','anLure','anRig','anWeather','anTime','anWater','anTide'].forEach(id=>$(id).value='');renderAnalysis()};
+function renderAll(){let q=$('search').value.toLowerCase(),a=getR().filter(x=>Object.values(x).join(' ').toLowerCase().includes(q));$('allList').innerHTML=a.map(x=>`<div class="card item" data-id="${x.id}"><b>${esc(x.date)} ${esc(x.publicPlace||x.place)} ${x.size?x.size+'cm':''}</b><div class="muted">${esc(x.rod||x.tackle||'')} / ${esc(x.reel||'')} / ${esc(x.lure||'')}</div></div>`).join('')||'<div class="card">データなし</div>';document.querySelectorAll('.item[data-id]').forEach(b=>b.onclick=()=>{let x=getR().find(r=>r.id===+b.dataset.id);selectedDate=x?.date||'';openDetail(+b.dataset.id)})}$('search').oninput=renderAll;$('openAnalysis').onclick=()=>show('analysis');$('backAnalysis').onclick=()=>show('all');$('clearSearch').onclick=()=>{$('search').value='';renderAll()};['anPlace','anLure','anRig','anWeather','anTime','anWater','anTide'].forEach(id=>$(id).onchange=renderAnalysis);$('resetAnalysisFilters').onclick=()=>{['anPlace','anLure','anRig','anWeather','anTime','anWater','anTide'].forEach(id=>$(id).value='');renderAnalysis()};$('openNow').onclick=()=>{fillNow();$('nowPanel').style.display=$('nowPanel').style.display==='none'?'block':'none';};$('runNow').onclick=runNowLookup;
 function analysisTimeBucket(t){
   if(!t)return '';
   const h=parseInt(String(t).split(':')[0],10);if(!Number.isFinite(h))return '';
@@ -1078,6 +1098,13 @@ function renderAnalysis(){
   const ranked=a.filter(x=>Number.isFinite(Number(x.size))).sort((x,y)=>Number(y.size)-Number(x.size)).slice(0,10);
   $('ranking').innerHTML=ranked.length?ranked.map((x,i)=>`<div class="item"><b>${i+1}. ${Number(x.size)}cm</b> ${esc(x.place||'')}<div class="muted">${esc(x.date||'')} ${esc(x.catchTime||'')} / ${esc(x.lure||'')} ${x.rig?' / '+esc(x.rig):''}</div></div>`).join(''):'<div class="analysisEmpty">データなし</div>';
 }
+
+
+function nowMin(t){if(!t)return null;const p=String(t).split(':').map(Number);return Number.isFinite(p[0])?p[0]*60+(p[1]||0):null}
+function nowDiff(a,b){if(a==null||b==null)return null;const d=Math.abs(a-b);return Math.min(d,1440-d)}
+function nowScore(x,q){let sc=0,mx=0,why=[];if(q.place){mx+=45;if((x.place||'')!==q.place)return null;sc+=45;why.push('同じ場所')}if(q.weather){mx+=15;if((x.weather||'')===q.weather){sc+=15;why.push('同じ天気')}}if(q.time){mx+=20;const d=nowDiff(nowMin(x.catchTime),nowMin(q.time));if(d!=null){sc+=Math.max(0,20*(1-d/240));if(d<=60)why.push('時間±1h');else if(d<=120)why.push('時間±2h')}}if(q.water!==''){mx+=15;const a=Number(x.waterTemp),b=Number(q.water);if(Number.isFinite(a)&&Number.isFinite(b)){const d=Math.abs(a-b);sc+=Math.max(0,15*(1-d/6));if(d<=1)why.push('水温±1℃');else if(d<=3)why.push('水温±3℃')}}if(q.tide){mx+=5;if((x.tide||'')===q.tide){sc+=5;why.push('同じ潮')}}return mx?{x,match:Math.round(sc/mx*100),why}:null}
+function fillNow(){const ps=analysisUnique(null,x=>x.place||''),ws=analysisUnique('weather'),p=$('nowPlace'),w=$('nowWeather');p.innerHTML='<option value="">指定なし</option>'+ps.map(v=>`<option>${esc(v)}</option>`).join('');w.innerHTML='<option value="">指定なし</option>'+ws.map(v=>`<option>${esc(v)}</option>`).join('');if(!$('nowTime').value){const d=new Date();$('nowTime').value=String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')}}
+function runNowLookup(){const q={place:$('nowPlace').value,weather:$('nowWeather').value,time:$('nowTime').value,water:$('nowWater').value,tide:$('nowTide').value};const rows=getR().map(x=>nowScore(x,q)).filter(r=>r&&r.match>0).sort((a,b)=>b.match-a.match).slice(0,20);$('nowCount').textContent=rows.length+'件';$('nowResults').innerHTML=rows.length?rows.map((r,i)=>`<div class="nowResult"><div class="nowTop"><b>${i+1}</b><div><b>${esc(r.x.lure||'ルアー未記録')}${r.x.rig?' / '+esc(r.x.rig):''}</b><div class="muted">${esc(r.x.date||'')} ${esc(r.x.catchTime||'')} / ${esc(r.x.place||'')} / ${r.x.size||'-'}cm</div></div><div class="nowMatch">${r.match}%</div></div><div class="nowTags">${r.why.map(v=>`<span class="nowTag">${esc(v)}</span>`).join('')}</div></div>`).join(''):'<div class="analysisEmpty">近い過去釣果がありません</div>';const m={};rows.slice(0,15).forEach(r=>{const l=r.x.lure;if(l){m[l]=(m[l]||0)+1}});renderAnalysisBars('nowLureSummary',m)}
 
 function refreshReelModels(){let m=$('reelMaker').value,a=(REEL_DB[m]||[]).slice().sort((a,b)=>Number(b[0])-Number(a[0])||a[1].localeCompare(b[1],'ja'));$('reelModel').innerHTML='<option value="">モデルを選択</option>'+a.map((x,i)=>`<option value="${i}">${x[0]} ${esc(x[1])}</option>`).join('');$('reelGear').innerHTML='<option value="">モデルを選択</option>'}
 function reelModelsSorted(m){return (REEL_DB[m]||[]).slice().sort((a,b)=>Number(b[0])-Number(a[0])||a[1].localeCompare(b[1],'ja'))}
