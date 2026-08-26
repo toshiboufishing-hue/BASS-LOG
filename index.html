@@ -191,6 +191,11 @@ box-shadow:0 0 14px rgba(167,241,36,.10);display:flex;align-items:center;gap:6px
 align-items:center;justify-content:center;background:#a7f124;color:#0a1c16;font-size:11px;font-weight:1000}
 .aiStyleHome:active{transform:scale(.98)}
 
+
+.blOrderBtns{position:absolute;right:6px;top:6px;display:flex;gap:4px;z-index:5}
+.blOrderBtns button{width:28px;height:28px;border-radius:9px;border:1px solid rgba(255,255,255,.25);background:rgba(2,20,15,.82);color:#fff;font-size:16px;font-weight:900;padding:0}
+.blOrderBtns button:disabled{opacity:.25}
+
 </style>
 </head><body><button id="homeAIStyle" class="aiStyleHome" type="button">🧠 AI STYLE <span id="homeAILearnCount" class="aiCount">0</span></button>
 <div class="wrap">
@@ -1287,7 +1292,7 @@ backdrop-filter:blur(10px);padding:0}
     <div class="blSetSection">
       <div class="blSetSectionTitle">ホーム</div>
       <div class="blCardOrderWrap">
-        <div class="blCardOrderHead"><div class="blSetName">最大魚カードの順番</div><div class="blSetDesc">カードを長押しして左右にドラッグ</div></div>
+        <div class="blCardOrderHead"><div class="blSetName">最大魚カードの順番</div><div class="blSetDesc">左右の矢印で順番を変更</div></div>
         <div id="blHomeCardOrderGrid" class="blCardOrderGrid" aria-label="最大魚カード並び替え"></div>
       </div>
     </div>
@@ -1305,39 +1310,29 @@ backdrop-filter:blur(10px);padding:0}
  function saveGrid(){const order=[...grid.children].map(x=>x.dataset.key);localStorage.setItem(CARD_KEY,order.join(','));window.dispatchEvent(new CustomEvent('basslog-home-card-order-change'));}
  let drag=null;
  function moveAt(x){if(!drag)return;const cards=[...grid.children].filter(c=>c!==drag);let before=cards.find(c=>x<c.getBoundingClientRect().left+c.getBoundingClientRect().width/2);if(before)grid.insertBefore(drag,before);else grid.appendChild(drag)}
- function bindDrag(){[...grid.children].forEach(card=>{
-   card.addEventListener('dragstart',e=>{drag=card;card.classList.add('dragging');if(e.dataTransfer)e.dataTransfer.effectAllowed='move'});
-   card.addEventListener('dragend',()=>{card.classList.remove('dragging');[...grid.children].forEach(c=>c.classList.remove('dragover'));drag=null;saveGrid()});
-   card.addEventListener('dragover',e=>{e.preventDefault();moveAt(e.clientX)});
-
-   let touchActive=false,startX=0,startY=0,moved=false;
-   card.addEventListener('touchstart',e=>{
-     if(e.touches.length!==1)return;
-     const t=e.touches[0];
-     touchActive=true;moved=false;startX=t.clientX;startY=t.clientY;
-     drag=card;card.classList.add('dragging');
-   },{passive:true});
-   card.addEventListener('touchmove',e=>{
-     if(!touchActive||drag!==card||e.touches.length!==1)return;
-     const t=e.touches[0];
-     if(Math.abs(t.clientX-startX)>4||Math.abs(t.clientY-startY)>4)moved=true;
-     if(moved){
-       e.preventDefault();
-       moveAt(t.clientX);
-     }
-   },{passive:false});
-   const touchEnd=()=>{
-     if(!touchActive)return;
-     touchActive=false;
-     if(drag===card){
-       card.classList.remove('dragging');
-       drag=null;
-       saveGrid();
-     }
-   };
-   card.addEventListener('touchend',touchEnd,{passive:true});
-   card.addEventListener('touchcancel',touchEnd,{passive:true});
- })}
+ function bindDrag(){
+  const cards=[...grid.children];
+  cards.forEach((card,i)=>{
+    const left=card.querySelector('.blMoveLeft');
+    const right=card.querySelector('.blMoveRight');
+    if(left){
+      left.disabled=i===0;
+      left.onclick=e=>{
+        e.stopPropagation();
+        const prev=card.previousElementSibling;
+        if(prev){grid.insertBefore(card,prev);saveGrid();bindDrag();}
+      };
+    }
+    if(right){
+      right.disabled=i===cards.length-1;
+      right.onclick=e=>{
+        e.stopPropagation();
+        const next=card.nextElementSibling;
+        if(next){grid.insertBefore(next,card);saveGrid();bindDrag();}
+      };
+    }
+  });
+}
  const load=()=>{const on=localStorage.getItem(KEY)==='1';ai.checked=on;detail.classList.toggle('show',on);document.documentElement.dataset.aiEnabled=on?'1':'0';renderOrderCards()};
  btn.onclick=()=>{load();ov.classList.add('open');ov.setAttribute('aria-hidden','false')};
  const shut=()=>{ov.classList.remove('open');ov.setAttribute('aria-hidden','true')};
