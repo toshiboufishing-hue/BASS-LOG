@@ -228,6 +228,10 @@ align-items:center;justify-content:center;background:#a7f124;color:#0a1c16;font-
 .nowTag{font-size:11px;padding:4px 7px;border-radius:999px;border:1px solid rgba(167,241,36,.28)}
 .nowTop{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center}
 #tide,#nowTide{pointer-events:none;background:#d9ded9;color:#17310b;font-weight:850}
+
+.basslog-tagline{margin:4px 0 16px;text-align:center;line-height:1.25}
+.basslog-tagline-en{color:#f1f1ed;font-size:clamp(15px,4vw,19px);font-weight:700;letter-spacing:.055em;font-style:italic}
+.basslog-tagline-ja{margin-top:5px;color:#9da789;font-size:11px;font-weight:600;letter-spacing:.08em}
 </style>
 </head><body><button id="homeAIStyle" class="aiStyleHome" type="button">🧠 AI STYLE <span id="homeAILearnCount" class="aiCount">0</span></button>
 <div class="wrap">
@@ -261,7 +265,10 @@ Chromeのメニューから「アプリをインストール」でも追加で�
 <option value="claude">Claude</option>
 </select>
 <div class="note" style="margin-top:8px">AIを選択した場合だけAI STYLEを表示します。OFFでも学習データは保持します。</div>
-</div><button id="backHome" class="btn sec">← ホーム</button><div class="card"><h3>✨ ホームカスタム</h3><div class="homeChoice"><label><input type="radio" name="heroMode" value="pb">自己最大魚</label><label><input type="radio" name="heroMode" value="latest">最新釣果</label><label><input type="radio" name="heroMode" value="custom">好きな写真</label><label><input type="radio" name="heroMode" value="plain">写真なし</label></div><div style="margin-top:10px"><label>好きな写真</label><input id="customHero" type="file" accept="image/*"></div><button id="saveHome" class="btn pri" style="width:100%;margin-top:10px">ホーム設定を保存</button></div></section>
+</div><button id="backHome" class="btn sec">← ホーム</button><div class="card"><h3>✨ ホームカスタム</h3><div class="homeChoice"><div class="basslog-tagline">
+  <div class="basslog-tagline-en">Fish the Future with Your Past.</div>
+  <div class="basslog-tagline-ja">過去の自分から、未来を釣る。</div>
+</div><label><input type="radio" name="heroMode" value="pb">自己最大魚</label><label><input type="radio" name="heroMode" value="latest">最新釣果</label><label><input type="radio" name="heroMode" value="custom">好きな写真</label><label><input type="radio" name="heroMode" value="plain">写真なし</label></div><div style="margin-top:10px"><label>好きな写真</label><input id="customHero" type="file" accept="image/*"></div><button id="saveHome" class="btn pri" style="width:100%;margin-top:10px">ホーム設定を保存</button></div></section>
 
 <section id="day" style="display:none"><button id="backCal" class="btn sec">← カレンダー</button><h2 id="dt"></h2><div id="daySummary" class="tripBanner"></div><div id="gal" class="gallery"></div><div class="card"><button id="daySNS" class="btn pri" style="width:100%">📸 この日のInstagram投稿素材</button></div></section>
 <section id="detail" style="display:none"><button id="backDay" class="btn sec">← 写真一覧</button><div id="detailBox"></div>
