@@ -143,7 +143,8 @@ body{background:linear-gradient(180deg,#07110f 0%,#091713 55%,#07110f 100%);colo
 }
 .wrap.homeMode .brand{flex:0 0 auto}
 .wrap.homeMode #installAppBtn,
-.wrap.homeMode #installHint{flex:0 0 auto}
+.wrap.homeMode #installHint,
+.wrap.homeMode .homeTaglineRow{flex:0 0 auto}
 .wrap.homeMode #home{
   flex:1 1 auto;
   height:auto !important;
@@ -229,9 +230,29 @@ align-items:center;justify-content:center;background:#a7f124;color:#0a1c16;font-
 .nowTop{display:grid;grid-template-columns:34px 1fr auto;gap:9px;align-items:center}
 #tide,#nowTide{pointer-events:none;background:#d9ded9;color:#17310b;font-weight:850}
 
-.basslog-tagline{margin:4px 0 16px;text-align:center;line-height:1.25}
-.basslog-tagline-en{color:#f1f1ed;font-size:clamp(15px,4vw,19px);font-weight:700;letter-spacing:.055em;font-style:italic}
-.basslog-tagline-ja{margin-top:5px;color:#9da789;font-size:11px;font-weight:600;letter-spacing:.08em}
+.homeTaglineRow{
+  flex:0 0 auto;
+  height:28px;
+  display:flex;
+  align-items:center;
+  justify-content:flex-end;
+  padding:0 4px;
+  margin:0 0 7px;
+}
+.homeTagline{
+  color:#f1f1ed;
+  font-size:clamp(11px,3.15vw,14px);
+  font-weight:650;
+  font-style:italic;
+  letter-spacing:.025em;
+  line-height:1;
+  white-space:nowrap;
+  text-align:right;
+}
+@media(max-width:350px){
+  .homeTaglineRow{height:25px;margin-bottom:6px}
+  .homeTagline{font-size:10.5px}
+}
 </style>
 </head><body><button id="homeAIStyle" class="aiStyleHome" type="button">🧠 AI STYLE <span id="homeAILearnCount" class="aiCount">0</span></button>
 <div class="wrap">
@@ -250,11 +271,8 @@ align-items:center;justify-content:center;background:#a7f124;color:#0a1c16;font-
 <div id="installHint" class="note" style="display:none;text-align:center;margin-bottom:8px">
 Chromeのメニューから「アプリをインストール」でも追加できます
 </div>
+<div class="homeTaglineRow"><div class="homeTagline">Fish the Future with Your Past.</div></div>
 <section id="home">
-<div class="basslog-tagline">
-  <div class="basslog-tagline-en">Fish the Future with Your Past.</div>
-  <div class="basslog-tagline-ja">過去の自分から、未来を釣る。</div>
-</div>
 <div class="homeMaxCards"><button class="maxCard" id="maxMonth"></button><button class="maxCard" id="maxYear"></button><button class="maxCard" id="maxAll"></button></div>
 <div class="card calendarShell"><div class="monthbar"><button id="prev" class="btn sec">‹</button><h2 id="mt"></h2><button id="next" class="btn sec">›</button></div><div class="week"><div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div></div><div id="cal" class="cal"></div></div>
 </section>
