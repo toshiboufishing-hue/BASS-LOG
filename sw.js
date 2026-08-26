@@ -1,4 +1,4 @@
-const CACHE='basslog-v10-6-water-color-20260827';
+const CACHE='basslog-v10-6-water-color-5step-20260827';
 const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
 self.addEventListener('install',event=>{
   event.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
