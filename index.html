@@ -213,7 +213,7 @@ Chromeのメニューから「アプリをインストール」でも追加で�
 <div class="card calendarShell"><div class="monthbar"><button id="prev" class="btn sec">‹</button><h2 id="mt"></h2><button id="next" class="btn sec">›</button></div><div class="week"><div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div></div><div id="cal" class="cal"></div></div>
 </section>
 
-<section id="homeSettings" style="display:none"><button id="backHome" class="btn sec">← ホーム</button><div class="card"><h3>✨ ホームカスタム</h3><div class="homeChoice"><label><input type="radio" name="heroMode" value="pb">自己最大魚</label><label><input type="radio" name="heroMode" value="latest">最新釣果</label><label><input type="radio" name="heroMode" value="custom">好きな写真</label><label><input type="radio" name="heroMode" value="plain">写真なし</label></div><div style="margin-top:10px"><label>好きな写真</label><input id="customHero" type="file" accept="image/*"></div><button id="saveHome" class="btn pri" style="width:100%;margin-top:10px">ホーム設定を保存</button></div></section>
+<section id="homeSettings" style="display:none"><div class="card"><h3>⚙️ オプション機能</h3><label>AI文章機能</label><select id="aiOptionSelect"><option value="off">使用しない</option><option value="chatgpt">ChatGPT</option><option value="gemini">Gemini</option><option value="claude">Claude</option></select><div class="note" style="margin-top:8px">AIを選択した場合だけAI機能を表示します。OFFでも学習データは保持されます。</div></div><button id="backHome" class="btn sec">← ホーム</button><div class="card"><h3>✨ ホームカスタム</h3><div class="homeChoice"><label><input type="radio" name="heroMode" value="pb">自己最大魚</label><label><input type="radio" name="heroMode" value="latest">最新釣果</label><label><input type="radio" name="heroMode" value="custom">好きな写真</label><label><input type="radio" name="heroMode" value="plain">写真なし</label></div><div style="margin-top:10px"><label>好きな写真</label><input id="customHero" type="file" accept="image/*"></div><button id="saveHome" class="btn pri" style="width:100%;margin-top:10px">ホーム設定を保存</button></div></section>
 
 <section id="day" style="display:none"><button id="backCal" class="btn sec">← カレンダー</button><h2 id="dt"></h2><div id="daySummary" class="tripBanner"></div><div id="gal" class="gallery"></div><div class="card"><button id="daySNS" class="btn pri" style="width:100%">📸 この日のInstagram投稿素材</button></div></section>
 <section id="detail" style="display:none"><button id="backDay" class="btn sec">← 写真一覧</button><div id="detailBox"></div>
@@ -292,8 +292,8 @@ Chromeのメニューから「アプリをインストール」でも追加で�
 
 <section id="tackle" style="display:none"><div class="card"><h3>🎣 ロッド</h3><div class="regRow"><input id="newRod" placeholder="ロッド名"><button id="addRod" class="btn pri">追加</button></div><div id="rodList"></div></div><div class="card"><h3>⚙️ リール</h3><div class="note" style="margin-bottom:10px">主要3メーカーの2000年代後半〜2026年モデルを、新しい順で候補から登録できます。主要モデルはメーカー資料を優先して見直しています。候補に無い機種は従来どおり手入力できます。</div><div class="grid"><div><label>メーカー</label><select id="reelMaker"><option value="">選択</option><option>SHIMANO</option><option>DAIWA</option><option>Abu Garcia</option></select></div><div><label>モデル</label><select id="reelModel"><option value="">メーカーを選択</option></select></div><div><label>ギヤ比</label><select id="reelGear"><option value="">モデルを選択</option></select></div><div><label>ハンドル</label><select id="reelHand"><option value="">指定なし</option><option>RIGHT</option><option>LEFT</option></select></div></div><button id="addReelCatalog" class="btn pri" style="width:100%;margin:10px 0 12px">候補からリール登録</button><div class="regRow"><input id="newReel" placeholder="候補に無いリール名を手入力"><button id="addReel" class="btn sec">手動追加</button></div><div id="reelList"></div></div><div class="card"><h3>⭐ タックルセット</h3><div class="grid"><div class="full"><label>セット名</label><input id="newSetName" placeholder="例：MH巻物"></div><div><label>ロッド</label><select id="newSetRod"></select></div><div><label>リール</label><select id="newSetReel"></select></div><div><label>ライン</label><select id="newSetLineType"><option>フロロ</option><option>ナイロン</option><option>カーボナイロン</option><option>PE</option></select></div><div><label id="newSetSizeLabel">lb</label><select id="newSetLb"></select></div></div><button id="addSet" class="btn pri" style="width:100%;margin-top:10px">セット登録</button><div id="setList"></div></div></section>
 
-<section id="sns" style="display:none"><button id="backSNS" class="btn sec">← 日別一覧</button><div class="card"><h3>📸 Instagram投稿素材</h3><div id="snsPrivacy" class="note privacy"></div><textarea id="snsText" class="snsText"></textarea><div class="card" style="margin-top:10px"><h3>✨ AI POST</h3><div class="note">当日の投稿素材と保存済み文体サンプルをAI生成用データにまとめます。</div><button id="buildAIPost" class="btn pri" style="width:100%;margin-top:10px">AI投稿データを作成</button><div id="aiPostStatus" class="note" style="margin-top:8px"></div><textarea id="aiPromptPreview" class="snsText" style="display:none;margin-top:10px" readonly></textarea><button id="copyAIPrompt" class="btn sec" style="display:none;width:100%;margin-top:8px">コピー</button></div>
-<div class="grid" style="margin-top:10px">
+<section id="sns" style="display:none"><button id="backSNS" class="btn sec">← 日別一覧</button><div class="card"><h3>📸 Instagram投稿素材</h3><div id="snsPrivacy" class="note privacy"></div><textarea id="snsText" class="snsText"></textarea><div id="aiPostPanel" class="card" style="margin-top:10px"><h3>✨ AI POST</h3><div class="note">当日の投稿素材と保存済み文体サンプルをAI生成用データにまとめます。</div><button id="buildAIPost" class="btn pri" style="width:100%;margin-top:10px">AI投稿データを作成</button><div id="aiPostStatus" class="note" style="margin-top:8px"></div><textarea id="aiPromptPreview" class="snsText" style="display:none;margin-top:10px" readonly></textarea><button id="copyAIPrompt" class="btn sec" style="display:none;width:100%;margin-top:8px">コピー</button></div>
+<div id="aiLearnActions" class="grid" style="margin-top:10px">
   <button id="saveCurrentAsLearn" class="btn sec">🧠 この文章を学習用に保存</button>
   <button id="openInstaLearn" class="btn pri">✨ 文体学習ライブラリ</button>
 </div></div><div class="card"><h3>4:5 写真テンプレート</h3><div id="snsFishSelect"></div><canvas id="instaCanvas" class="instaCanvas" width="1080" height="1350"></canvas><div class="grid" style="margin-top:10px"><div><label>文字位置</label><select id="instaPos"><option value="bl">左下</option><option value="br">右下</option><option value="tl">左上</option><option value="tr">右上</option></select></div><button id="saveInsta" class="btn pri" style="align-self:end">画像を保存</button></div></div></section>
@@ -459,7 +459,7 @@ const getTrip=()=>{try{return JSON.parse(localStorage.getItem(TRIPKEY)||'null')}
 const getHome=()=>{try{return JSON.parse(localStorage.getItem(HOMEKEY)||'{"mode":"pb","custom":""}')}catch{return{mode:'pb',custom:''}}},setHome=v=>localStorage.setItem(HOMEKEY,JSON.stringify(v));
 const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
 let currentView='home';
-function show(v){currentView=v;const ai=$('homeAIStyle');if(ai)ai.style.display=v==='home'?'flex':'none';document.querySelector('.wrap')?.classList.toggle('homeMode',v==='home');['home','homeSettings','day','detail','trip','entry','measure','all','analysis','tackle','sns','instaLearn'].forEach(x=>$(x).style.display=x===v?'block':'none');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));if(v==='home')renderHome();if(v==='trip')renderTrip();if(v==='entry'){
+function show(v){currentView=v;const ai=$('homeAIStyle');if(ai)ai.style.display=(v==='home'&&getAIOption()!=='off')?'flex':'none';document.querySelector('.wrap')?.classList.toggle('homeMode',v==='home');['home','homeSettings','day','detail','trip','entry','measure','all','analysis','tackle','sns','instaLearn'].forEach(x=>$(x).style.display=x===v?'block':'none');document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.v===v));if(v==='home')renderHome();if(v==='trip')renderTrip();if(v==='entry'){
   if(returningFromMeasure){
     returningFromMeasure=false;
     restoreEntryDraft(entryDraft);
@@ -989,6 +989,10 @@ function renderTackle(){let t=getT(),row=(x,i,c)=>`<div class="regItem"><span>${
 $('addRod').onclick=()=>{let v=$('newRod').value.trim();if(!v)return;let t=getT();if(!t.rods.includes(v))t.rods.push(v);setT(t);$('newRod').value='';renderTackle()};$('addReel').onclick=()=>{let v=$('newReel').value.trim();if(!v)return;let t=getT();if(!t.reels.includes(v))t.reels.push(v);setT(t);$('newReel').value='';renderTackle()};$('addSet').onclick=()=>{let n=$('newSetName').value.trim(),lb=parseFloat($('newSetLb').value);if(!n||!$('newSetRod').value||!$('newSetReel').value||!lb){alert('セット内容を入力してね');return}let t=getT();t.sets.push({name:n,rod:$('newSetRod').value,reel:$('newSetReel').value,type:$('newSetLineType').value,lb});setT(t);$('newSetName').value='';$('newSetLb').value='';renderTackle()};
 
 
+const AI_OPTION_KEY='basslog_ai_option_v1';
+function getAIOption(){return localStorage.getItem(AI_OPTION_KEY)||'off'}
+function setAIOption(v){localStorage.setItem(AI_OPTION_KEY,v||'off');updateAIOptionUI()}
+function updateAIOptionUI(){const v=getAIOption(),sel=$('aiOptionSelect'),badge=$('homeAIStyle');if(sel)sel.value=v;if(badge)badge.style.display=(currentView==='home'&&v!=='off')?'flex':'none';const post=$('aiPostPanel'),learn=$('aiLearnActions');if(post)post.style.display=v==='off'?'none':'block';if(learn)learn.style.display=v==='off'?'none':'grid'}
 const INSTA_LEARN_KEY='basslog_insta_style_samples_v1';
 function buildAIPostPackage(){
  const samples=getInstaLearnSamples().slice(-12), profile=analyzeInstaStyle();
@@ -1133,6 +1137,7 @@ function saveLearnSample(){
 
 $('daySNS').onclick=()=>openSNS(selectedDate);
 $('backSNS').onclick=()=>openDay(currentSNSDate);
+$('aiOptionSelect').onchange=e=>setAIOption(e.target.value);
 $('homeAIStyle').onclick=()=>openInstaLearn();
 $('openInstaLearn').onclick=()=>openInstaLearn();
 $('backInstaLearn').onclick=()=>{show('sns');drawInsta()};
@@ -1181,7 +1186,7 @@ function installBackGuard(){
   });
 }
 
-async function startBassLog(){
+async function startBassLog(){updateAIOptionUI();
   document.querySelector('.wrap')?.classList.add('homeMode');
   installBackGuard();
   await migrateLegacyMedia();
