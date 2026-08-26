@@ -192,9 +192,14 @@ align-items:center;justify-content:center;background:#a7f124;color:#0a1c16;font-
 .aiStyleHome:active{transform:scale(.98)}
 
 
-.blOrderBtns{position:absolute;right:6px;top:6px;display:flex;gap:4px;z-index:5}
-.blOrderBtns button{width:28px;height:28px;border-radius:9px;border:1px solid rgba(255,255,255,.25);background:rgba(2,20,15,.82);color:#fff;font-size:16px;font-weight:900;padding:0}
-.blOrderBtns button:disabled{opacity:.25}
+
+
+
+
+
+.blOrderCard{appearance:none;-webkit-appearance:none;padding:0;text-align:left;cursor:pointer;touch-action:manipulation;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+.blOrderCard.isSelected{border:2px solid #9cff00!important;box-shadow:0 0 0 2px rgba(156,255,0,.22),0 0 18px rgba(156,255,0,.28);transform:translateY(-2px)}
+.blOrderCard.isSelected::after{content:"交換先をタップ";position:absolute;left:6px;right:6px;top:6px;padding:4px 3px;border-radius:7px;background:rgba(10,35,22,.88);color:#b7ff43;font-size:10px;font-weight:900;text-align:center;z-index:6}
 
 </style>
 </head><body><button id="homeAIStyle" class="aiStyleHome" type="button">🧠 AI STYLE <span id="homeAILearnCount" class="aiCount">0</span></button>
@@ -1292,7 +1297,7 @@ backdrop-filter:blur(10px);padding:0}
     <div class="blSetSection">
       <div class="blSetSectionTitle">ホーム</div>
       <div class="blCardOrderWrap">
-        <div class="blCardOrderHead"><div class="blSetName">最大魚カードの順番</div><div class="blSetDesc">左右の矢印で順番を変更</div></div>
+        <div class="blCardOrderHead"><div class="blSetName">最大魚カードの順番</div><div class="blSetDesc">入れ替えたい2枚を順番にタップ</div></div>
         <div id="blHomeCardOrderGrid" class="blCardOrderGrid" aria-label="最大魚カード並び替え"></div>
       </div>
     </div>
@@ -1306,31 +1311,36 @@ backdrop-filter:blur(10px);padding:0}
  const validOrder=()=>{let a=(localStorage.getItem(CARD_KEY)||'month,year,all').split(',').filter(x=>['month','year','all'].includes(x));return a.length===3&&new Set(a).size===3?a:['month','year','all']};
  const sourceFor=k=>({month:document.getElementById('maxMonth'),year:document.getElementById('maxYear'),all:document.getElementById('maxAll')})[k];
  const fallback={month:['今月最大','-- cm'],year:['今年最大','-- cm'],all:['歴代最大','-- cm']};
- function renderOrderCards(){if(!grid)return;grid.innerHTML='';validOrder().forEach(k=>{const src=sourceFor(k),card=document.createElement('div');card.className='blOrderCard';card.dataset.key=k;let img=src?.querySelector('img')?.getAttribute('src')||'',label=src?.querySelector('.maxCardLabel')?.textContent||fallback[k][0],size=src?.querySelector('.maxCardSize')?.textContent||fallback[k][1];card.innerHTML=`${img?`<img src="${img}" alt="">`:''}<div class="blOrderBtns"><button type="button" class="blMoveLeft" aria-label="左へ">←</button><button type="button" class="blMoveRight" aria-label="右へ">→</button></div><div class="blOrderCardText"><div class="blOrderCardLabel">${label}</div><div class="blOrderCardSize">${size}</div></div>`;grid.appendChild(card)});bindDrag()}
+ function renderOrderCards(){if(!grid)return;grid.innerHTML='';validOrder().forEach(k=>{const src=sourceFor(k),card=document.createElement('button');card.type='button';card.className='blOrderCard';card.dataset.key=k;let img=src?.querySelector('img')?.getAttribute('src')||'',label=src?.querySelector('.maxCardLabel')?.textContent||fallback[k][0],size=src?.querySelector('.maxCardSize')?.textContent||fallback[k][1];card.innerHTML=`${img?`<img src="${img}" alt="">`:''}<div class="blOrderCardText"><div class="blOrderCardLabel">${label}</div><div class="blOrderCardSize">${size}</div></div>`;grid.appendChild(card)});bindTapSwap()}
  function saveGrid(){const order=[...grid.children].map(x=>x.dataset.key);localStorage.setItem(CARD_KEY,order.join(','));window.dispatchEvent(new CustomEvent('basslog-home-card-order-change'));}
- function bindDrag(){
-  const cards=[...grid.children];
-  cards.forEach((card,i)=>{
-    const left=card.querySelector('.blMoveLeft');
-    const right=card.querySelector('.blMoveRight');
-    if(left){
-      left.disabled=i===0;
-      left.onclick=e=>{
-        e.stopPropagation();
-        const prev=card.previousElementSibling;
-        if(prev){grid.insertBefore(card,prev);saveGrid();}
-      };
-    }
-    if(right){
-      right.disabled=i===cards.length-1;
-      right.onclick=e=>{
-        e.stopPropagation();
-        const next=card.nextElementSibling;
-        if(next){grid.insertBefore(next,card);saveGrid();}
-      };
-    }
-  });
-}
+ let selectedOrderKey=null;
+ function bindTapSwap(){
+   if(!grid)return;
+   [...grid.querySelectorAll('.blOrderCard')].forEach(card=>{
+     card.onclick=()=>{
+       const key=card.dataset.key;
+       if(!selectedOrderKey){
+         selectedOrderKey=key;
+         card.classList.add('isSelected');
+         return;
+       }
+       if(selectedOrderKey===key){
+         selectedOrderKey=null;
+         card.classList.remove('isSelected');
+         return;
+       }
+       const order=validOrder();
+       const a=order.indexOf(selectedOrderKey), b=order.indexOf(key);
+       if(a>=0&&b>=0){
+         [order[a],order[b]]=[order[b],order[a]];
+         localStorage.setItem(CARD_KEY,order.join(','));
+         applyHomeOrder();
+       }
+       selectedOrderKey=null;
+       renderOrderCards();
+     };
+   });
+ }
  const load=()=>{const on=localStorage.getItem(KEY)==='1';ai.checked=on;detail.classList.toggle('show',on);document.documentElement.dataset.aiEnabled=on?'1':'0';renderOrderCards()};
  btn.onclick=()=>{load();ov.classList.add('open');ov.setAttribute('aria-hidden','false')};
  const shut=()=>{ov.classList.remove('open');ov.setAttribute('aria-hidden','true')};
