@@ -1,6 +1,6 @@
-// Bass Log service worker revision: v10.51
-const BASS_LOG_SW_REVISION = 'v10.51';
-const CACHE_NAME='basslog-v10-51-photo-first-quick-camera-20260828';
+// Bass Log service worker revision: v10.52
+const BASS_LOG_SW_REVISION = 'v10.52';
+const CACHE_NAME='basslog-v10-52-quick-camera-float-save-20260828';
 const OFFLINE_URL='./index.html';
 
 self.addEventListener('install',event=>{
