@@ -1,5 +1,5 @@
-// Bass Log service worker revision: v10.46
-const BASS_LOG_SW_REVISION = 'v10.46';
+// Bass Log service worker revision: v10.47
+const BASS_LOG_SW_REVISION = 'v10.47';
 const CACHE_NAME='basslog-v10-42-now-strong-20260827';
 const OFFLINE_URL='./index.html';
 
