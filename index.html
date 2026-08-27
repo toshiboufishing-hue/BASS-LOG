@@ -2389,4 +2389,22 @@ backdrop-filter:blur(10px);padding:0}
 })();
 </script>
 
-</body></html>
+</body></html><style id="basslog-v1055-calendar-border-fix2">
+/* Correct target is #cal (not #calendar). Remove ordinary day-cell frames only. */
+#home .calendarShell #cal .day:not(.has):not(.today){
+  border-color:transparent !important;
+  box-shadow:none !important;
+}
+#home .calendarShell #cal .day.has{
+  border-color:#98e51d !important;
+}
+#home .calendarShell #cal .day.today{
+  border-color:transparent !important;
+  outline:2px solid #f2f6f4 !important;
+  outline-offset:0 !important;
+}
+#home .calendarShell #cal .day.empty{
+  border:0 !important;
+  box-shadow:none !important;
+}
+</style>

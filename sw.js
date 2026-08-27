@@ -1,6 +1,6 @@
-// Bass Log service worker revision: v10.55
-const BASS_LOG_SW_REVISION = 'v10.55';
-const CACHE_NAME='basslog-v10-55-calendar-border-fix-20260828';
+// Bass Log service worker revision: v10.54
+const BASS_LOG_SW_REVISION = 'v10.54';
+const CACHE_NAME='basslog-v10-54-nav-camera-20260828';
 const OFFLINE_URL='./index.html';
 
 self.addEventListener('install',event=>{
