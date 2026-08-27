@@ -1,6 +1,6 @@
-// Bass Log service worker revision: v10.39
-const BASS_LOG_SW_REVISION = 'v10.39';
-const CACHE_NAME='basslog-v10-16-header-redo-20260827';
+// Bass Log service worker revision: v10.40
+const BASS_LOG_SW_REVISION = 'v10.41';
+const CACHE_NAME='basslog-v10-41-weather-auto-20260827';
 const OFFLINE_URL='./index.html';
 
 self.addEventListener('install',event=>{
