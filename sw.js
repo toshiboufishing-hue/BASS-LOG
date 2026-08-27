@@ -1,22 +1,57 @@
-const CACHE='basslog-v10-7-home-repro-20260827';
-const CORE=['./','./index.html','./manifest.webmanifest','./icon-192.png','./icon-512.png'];
+const CACHE_NAME='basslog-v10-8-network-first-20260827';
+const OFFLINE_URL='./index.html';
+
 self.addEventListener('install',event=>{
-  event.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));
+  self.skipWaiting();
 });
+
 self.addEventListener('activate',event=>{
-  event.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));
+  event.waitUntil((async()=>{
+    const keys=await caches.keys();
+    await Promise.all(keys.map(key=>caches.delete(key)));
+    await self.clients.claim();
+  })());
 });
+
 self.addEventListener('fetch',event=>{
-  if(event.request.method!=='GET')return;
-  const req=event.request;
-  const isNav=req.mode==='navigate'||new URL(req.url).pathname.endsWith('/index.html');
-  if(isNav){
-    event.respondWith(fetch(req,{cache:'no-store'}).then(res=>{
-      const copy=res.clone();caches.open(CACHE).then(c=>c.put('./index.html',copy));return res;
-    }).catch(()=>caches.match('./index.html')));
+  const request=event.request;
+  if(request.method!=='GET') return;
+
+  if(request.mode==='navigate'){
+    event.respondWith((async()=>{
+      try{
+        const response=await fetch(request,{cache:'no-store'});
+        if(response && response.ok){
+          const cache=await caches.open(CACHE_NAME);
+          await cache.put(OFFLINE_URL,response.clone());
+        }
+        return response;
+      }catch(err){
+        const cached=await caches.match(OFFLINE_URL);
+        if(cached) return cached;
+        throw err;
+      }
+    })());
     return;
   }
-  event.respondWith(caches.match(req).then(cached=>cached||fetch(req).then(res=>{
-    const copy=res.clone();caches.open(CACHE).then(c=>c.put(req,copy));return res;
-  })));
+
+  if(new URL(request.url).pathname.endsWith('/sw.js')){
+    event.respondWith(fetch(request,{cache:'no-store'}));
+    return;
+  }
+
+  event.respondWith((async()=>{
+    try{
+      const response=await fetch(request,{cache:'no-store'});
+      if(response && response.ok){
+        const cache=await caches.open(CACHE_NAME);
+        await cache.put(request,response.clone());
+      }
+      return response;
+    }catch(err){
+      const cached=await caches.match(request);
+      if(cached) return cached;
+      throw err;
+    }
+  })());
 });
