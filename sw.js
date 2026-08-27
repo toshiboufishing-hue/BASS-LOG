@@ -1,4 +1,4 @@
-const CACHE_NAME='basslog-v10-8-network-first-20260827';
+const CACHE_NAME='basslog-v10-9-network-first-20260827';
 const OFFLINE_URL='./index.html';
 
 self.addEventListener('install',event=>{
@@ -8,7 +8,7 @@ self.addEventListener('install',event=>{
 self.addEventListener('activate',event=>{
   event.waitUntil((async()=>{
     const keys=await caches.keys();
-    await Promise.all(keys.map(key=>caches.delete(key)));
+    await Promise.all(keys.filter(key=>key.startsWith('basslog-') && key!==CACHE_NAME).map(key=>caches.delete(key)));
     await self.clients.claim();
   })());
 });
