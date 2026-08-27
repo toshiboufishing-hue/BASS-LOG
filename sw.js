@@ -1,4 +1,4 @@
-const CACHE_NAME='basslog-v10-10-home-layout-20260827';
+const CACHE_NAME='basslog-v10-11-retrieve-fall-20260827';
 const OFFLINE_URL='./index.html';
 
 self.addEventListener('install',event=>{
