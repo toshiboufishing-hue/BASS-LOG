@@ -1,6 +1,6 @@
-// Bass Log service worker revision: v10.53
-const BASS_LOG_SW_REVISION = 'v10.53';
-const CACHE_NAME='basslog-v10-53-nav-camera-compact-save-20260828';
+// Bass Log service worker revision: v10.54
+const BASS_LOG_SW_REVISION = 'v10.54';
+const CACHE_NAME='basslog-v10-54-nav-camera-20260828';
 const OFFLINE_URL='./index.html';
 
 self.addEventListener('install',event=>{
