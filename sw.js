@@ -1,4 +1,4 @@
-const CACHE_NAME='basslog-v10-12-speed-label-20260827';
+const CACHE_NAME='basslog-v10-13-now-size-20260827';
 const OFFLINE_URL='./index.html';
 
 self.addEventListener('install',event=>{
