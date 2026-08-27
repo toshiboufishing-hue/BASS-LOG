@@ -1,5 +1,5 @@
-// Bass Log service worker revision: v10.31
-const BASS_LOG_SW_REVISION = 'v10.31';
+// Bass Log service worker revision: v10.32
+const BASS_LOG_SW_REVISION = 'v10.32';
 const CACHE_NAME='basslog-v10-16-header-redo-20260827';
 const OFFLINE_URL='./index.html';
 
