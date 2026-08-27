@@ -1,4 +1,4 @@
-const CACHE_NAME='basslog-v10-9-network-first-20260827';
+const CACHE_NAME='basslog-v10-10-network-first-20260827';
 const OFFLINE_URL='./index.html';
 
 self.addEventListener('install',event=>{
