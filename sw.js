@@ -1,4 +1,4 @@
-const CACHE_NAME='basslog-v10-14-logo-balance-20260827';
+const CACHE_NAME='basslog-v10-15-diagonal-logo-20260827';
 const OFFLINE_URL='./index.html';
 
 self.addEventListener('install',event=>{
