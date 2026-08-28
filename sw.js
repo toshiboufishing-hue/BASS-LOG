@@ -1,5 +1,5 @@
-// Bass Log service worker revision: v10.59
-const BASS_LOG_SW_REVISION = 'v10.59';
+// Bass Log service worker revision: v10.60
+const BASS_LOG_SW_REVISION = 'v10.60';
 const CACHE_NAME='basslog-v10-58-calendar-background-reset-20260828';
 const OFFLINE_URL='./index.html';
 
