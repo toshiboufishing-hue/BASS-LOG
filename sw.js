@@ -1,6 +1,6 @@
-// Bass Log service worker revision: v10.68
-const BASS_LOG_SW_REVISION = 'v10.68';
-const CACHE_NAME='basslog-v10-68-home-gap-20260830';
+// Bass Log service worker revision: v10.69
+const BASS_LOG_SW_REVISION = 'v10.69';
+const CACHE_NAME='basslog-v10-69-entry-text-place-20260831';
 const OFFLINE_URL='./index.html';
 
 self.addEventListener('install',event=>{
