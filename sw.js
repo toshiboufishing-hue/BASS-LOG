@@ -1,6 +1,6 @@
-// Bass Log service worker revision: v10.73
-const BASS_LOG_SW_REVISION = 'v10.73';
-const CACHE_NAME='basslog-v10-72-readable-analysis-20260901';
+// Bass Log service worker revision: v10.74
+const BASS_LOG_SW_REVISION = 'v10.74';
+const CACHE_NAME='basslog-v10-74-skunk-result-20260904';
 const OFFLINE_URL='./index.html';
 
 self.addEventListener('install',event=>{
