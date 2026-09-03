@@ -110,8 +110,6 @@ body{background:linear-gradient(180deg,#07110f 0%,#091713 55%,#07110f 100%);colo
 .calendarShell .day{background:rgba(255,255,255,.018);border-color:rgba(205,224,216,.20);color:#f8faf9}
 .calendarShell .day.has{background:radial-gradient(circle at 50% 55%,rgba(114,190,16,.34),rgba(21,71,29,.55) 60%,rgba(6,28,14,.86) 100%);border-color:#98e51d;box-shadow:0 0 12px rgba(137,229,21,.30),inset 0 0 16px rgba(108,183,16,.12)}
 .calendarShell .day.today{outline:2px solid #f2f6f4;outline-offset:0}
-.calendarShell .day.deco{background:rgba(45,45,45,.48);border-color:rgba(255,255,255,.28)}
-.calendarShell .decoMark{font-size:18px;font-weight:950;line-height:1.15;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.7)}
 .calendarShell .cnt{color:#fff}
 .nav{background:#06110e;border-top-color:#31433c;box-shadow:0 -8px 24px rgba(0,0,0,.25)}
 .nav button{color:#aab5b1}.nav .active{color:#a7f124}
@@ -758,10 +756,10 @@ Chromeのメニューから「アプリをインストール」でも追加で�
 <section id="detail" style="display:none"><button id="backDay" class="btn sec">← 写真一覧</button><div id="detailBox"></div>
 <div class="grid" style="margin-top:10px"><button id="editCatch" class="btn pri">✏️ この釣果を編集</button><button id="deleteCatch" class="btn danger">🗑️ 削除</button></div></section>
 
-<section id="trip" style="display:none"><div class="card"><h3>🚤 今日の釣行</h3><div class="note">釣行前に一度だけ設定。圏外でも端末内に保存されます。</div><div class="grid" style="margin-top:10px"><div><label>日付</label><input id="tripDate" type="date"></div><div><label>公開する場所</label><select id="publicPlace"><option>高滝湖</option><option>亀山湖</option><option>片倉ダム</option><option>戸面原ダム</option><option>将監川</option><option>長門川</option><option>野池</option><option>溜池</option><option>非公開</option><option>その他</option></select></div><div class="full"><label>自分用の詳細場所（SNSには出しません）</label><input id="privatePlace" list="savedPrivatePlaces" placeholder="例：自分だけ分かる池名・エリア名"></div><div><label>乗り物</label><select id="tripRide"><option>フローター</option><option>ローボート</option><option>バスボート</option><option>カヤック</option><option>おかっぱり</option><option>その他</option></select></div></div></div>
+<section id="trip" style="display:none"><div class="card"><h3>🚤 今日の釣行</h3><div class="note">釣行前に一度だけ設定。圏外でも端末内に保存されます。</div><div class="grid" style="margin-top:10px"><div><label>日付</label><input id="tripDate" type="date"></div><div><label>都道府県</label><select id="publicPrefecture"></select></div><div><label>公開する場所</label><select id="publicPlace"></select></div><div class="full"><label>自分用の詳細場所（SNSには出しません）</label><input id="privatePlace" list="savedPrivatePlaces" placeholder="例：自分だけ分かる池名・エリア名"></div><div><label>乗り物</label><select id="tripRide"><option>フローター</option><option>ローボート</option><option>バスボート</option><option>カヤック</option><option>おかっぱり</option><option>その他</option></select></div></div></div>
 <div class="card"><h3>🎣 今日持っていくタックル</h3><div id="todaySetList" class="todaySetGrid"></div></div><button id="saveTrip" class="btn pri" style="width:100%">今日の釣行を開始 / 更新</button><button id="endTrip" class="btn danger" style="width:100%;margin-top:8px">今日の釣行を終了</button></section>
 
-<section id="entry" style="display:none"><div id="editBanner" class="tripBanner" style="display:none"><b>✏️ 釣果を編集中</b><div class="muted">変更後に「更新を保存」を押してください</div></div><button id="cancelEdit" class="btn sec" style="display:none;margin-bottom:8px">← 編集をキャンセル</button><div id="entryTripInfo" class="tripBanner" style="display:none"></div><div class="card"><div class="grid"><div class="full"><label>写真</label><div class="photoBtns"><label class="fakeBtn">📷 今撮る<input id="cameraPhoto" type="file" accept="image/*" capture="environment"></label><label class="fakeBtn">🖼️ 写真から選ぶ<input id="galleryPhoto" type="file" accept="image/*" multiple></label></div><div class="note" style="margin-top:7px">最大10枚。撮影日時(EXIF)から日付・時間を自動入力。表紙は好きな写真を選択できます。長押しドラッグで並び替えできます。</div><div id="photoGrid" class="photoGrid"></div><img id="preview" class="preview"></div><div class="full"><div class="note privacy"><strong>位置情報は読み取りません。</strong> 写真はCanvasで再生成して保存するため、SNS用出力にも元画像のGPS/EXIF情報を引き継ぎません。</div></div><div class="full"><button id="openMeasure" class="btn sec" style="width:100%">📏 写真からサイズ計測 β</button></div><div><label>日付</label><input id="date" type="date"></div><div><label>釣れた時間</label><input id="catchTime" type="time"></div><div><label>公開場所</label><select id="entryPublicPlace"><option value=""></option><option>高滝湖</option><option>亀山湖</option><option>片倉ダム</option><option>戸面原ダム</option><option>将監川</option><option>長門川</option><option>野池</option><option>溜池</option><option>非公開</option><option>その他</option></select></div><div class="full"><label>自分用場所</label><input id="place" list="savedPrivatePlaces" placeholder="SNSには表示しません"><div id="placeWaterHint" class="note"></div></div>
+<section id="entry" style="display:none"><div id="editBanner" class="tripBanner" style="display:none"><b>✏️ 釣果を編集中</b><div class="muted">変更後に「更新を保存」を押してください</div></div><button id="cancelEdit" class="btn sec" style="display:none;margin-bottom:8px">← 編集をキャンセル</button><div id="entryTripInfo" class="tripBanner" style="display:none"></div><div class="card"><div class="grid"><div class="full"><label>写真</label><div class="photoBtns"><label class="fakeBtn">📷 今撮る<input id="cameraPhoto" type="file" accept="image/*" capture="environment"></label><label class="fakeBtn">🖼️ 写真から選ぶ<input id="galleryPhoto" type="file" accept="image/*" multiple></label></div><div class="note" style="margin-top:7px">最大10枚。撮影日時(EXIF)から日付・時間を自動入力。表紙は好きな写真を選択できます。長押しドラッグで並び替えできます。</div><div id="photoGrid" class="photoGrid"></div><img id="preview" class="preview"></div><div class="full"><div class="note privacy"><strong>位置情報は読み取りません。</strong> 写真はCanvasで再生成して保存するため、SNS用出力にも元画像のGPS/EXIF情報を引き継ぎません。</div></div><div class="full"><button id="openMeasure" class="btn sec" style="width:100%">📏 写真からサイズ計測 β</button></div><div><label>日付</label><input id="date" type="date"></div><div><label>釣れた時間</label><input id="catchTime" type="time"></div><div><label>都道府県</label><select id="entryPrefecture"></select></div><div><label>公開場所</label><select id="entryPublicPlace"></select></div><div class="full"><label>自分用場所</label><input id="place" list="savedPrivatePlaces" placeholder="SNSには表示しません"><div id="placeWaterHint" class="note"></div></div>
 
 
 <div class="full tempWeatherLocationBox" style="margin-top:8px">
@@ -792,7 +790,7 @@ Chromeのメニューから「アプリをインストール」でも追加で�
   <div id="catchPastWeatherStatus" class="note" style="margin-top:5px">日付・釣れた時間・釣り場から天気を自動入力</div>
 </div><div><label>サイズ(cm)</label><input id="size" type="number" step=".1"></div><div><label>水温(℃)</label><input id="waterTemp" type="number" step=".1"></div><div><label>💧 水色</label><select id="waterColor"><option></option><option>超クリア</option><option>クリア</option><option>ステイン</option><option>マッディ</option><option>強マッディ</option></select></div><div><label>📏 水位（満水基準）</label><input id="waterLevel" type="number" min="0" step="0.1" inputmode="decimal" placeholder="満水は0 / 例 0.7 → −0.7m"><div class="muted">満水＝0m。満水から下がった量を入力</div></div><div><label>⚡ リトリーブ速度</label><select id="retrieveSpeed"><option value="">未指定</option><option value="1">1 極遅</option><option value="2">2 遅い</option><option value="3">3 普通</option><option value="4">4 速い</option><option value="5">5 極速</option></select></div><div><label>⬇️ フォール速度</label><select id="fallSpeed"><option value="">未指定</option><option value="1">1 極遅</option><option value="2">2 遅い</option><option value="3">3 普通</option><option value="4">4 速い</option><option value="5">5 極速</option></select></div><div><label>気温(℃)</label><input id="airTemp" type="number" step=".1"></div><div><label>気圧(hPa)</label><input id="pressure" type="number" step=".1"></div><div><label>天気</label><select id="weather"><option></option><option>晴れ</option><option>曇り</option><option>雨</option><option>小雨</option><option>強風</option></select></div><div><label>潮回り（自動）</label><select id="tide"><option></option><option>大潮</option><option>中潮</option><option>小潮</option><option>長潮</option><option>若潮</option></select><div class="note">釣果の日付から自動入力</div></div><div><label>風向</label><select id="windDir"><option></option><option>北</option><option>北東</option><option>東</option><option>南東</option><option>南</option><option>南西</option><option>西</option><option>北西</option></select></div><div><label>風速</label><select id="windSpeed"><option></option><option value="0">0 m/s</option><option value="1">1 m/s</option><option value="2">2 m/s</option><option value="3">3 m/s</option><option value="4">4 m/s</option><option value="5">5 m/s</option><option value="6">6 m/s</option><option value="7">7 m/s</option><option value="8">8 m/s</option><option value="9">9 m/s</option><option value="10">10 m/s</option><option value="11">11 m/s</option><option value="12">12 m/s</option><option value="13">13 m/s</option><option value="14">14 m/s</option><option value="15">15 m/s</option><option value="16">16 m/s</option><option value="17">17 m/s</option><option value="18">18 m/s</option><option value="19">19 m/s</option><option value="20">20 m/s</option><option value="21">21 m/s</option><option value="22">22 m/s</option><option value="23">23 m/s</option><option value="24">24 m/s</option><option value="25">25 m/s</option><option value="26">26 m/s</option><option value="27">27 m/s</option><option value="28">28 m/s</option><option value="29">29 m/s</option><option value="30">30 m/s</option></select></div><div><label>乗り物</label><select id="ride"><option></option><option>フローター</option><option>ローボート</option><option>バスボート</option><option>カヤック</option><option>おかっぱり</option></select></div>
 
-<div class="full"><label>タックルセット</label><select id="tackleSet"><option value="">個別選択</option></select></div><div><label>ロッド</label><select id="rod"><option></option></select></div><div><label>リール</label><select id="reel"><option></option></select></div><div><label>ライン</label><select id="lineType"><option></option><option>フロロ</option><option>ナイロン</option><option>カーボナイロン</option><option>PE</option></select></div><div><label id="lineSizeLabel">lb</label><select id="lineLb"><option value=""></option></select></div><div><label>ルアー</label><input id="lure"></div><div><label>カラー</label><input id="color"></div><div><label>リグ</label><select id="rig"><option></option><option>ノーシンカー</option><option>ネコリグ</option><option>ダウンショット</option><option>テキサスリグ</option><option>フリーリグ</option><option>キャロライナリグ</option><option>ライトキャロ</option><option>ジカリグ</option><option>リーダーレスダウンショット</option><option>スプリットショット</option><option>ワッキーリグ</option><option>ジグヘッドリグ</option><option>ミドスト</option><option>ホバスト</option><option>モリケンリグ</option><option>ラバージグ</option><option>チャターベイト</option><option>スイムジグ</option><option>その他</option></select></div><div><label>シンカー重量</label><select id="sinkerWeight"><option></option><option>なし</option><option>0.3g</option><option>0.45g</option><option>0.6g</option><option>0.9g</option><option>1.3g</option><option>1.8g</option><option>2.2g</option><option>2.7g</option><option>3.5g</option><option>5g</option><option>7g</option><option>9g</option><option>10g</option><option>11g</option><option>14g</option><option>18g</option><option>21g</option><option>28g</option><option>その他</option></select></div><div><label>レンジ</label><input id="range"></div><div><label>釣り方</label><input id="method"></div><div class="full"><label>シチュエーション</label><textarea id="situation"></textarea></div></div></div><button id="saveCatch" class="btn pri" style="width:100%">この釣果を保存</button><button id="saveDeco" class="btn sec" style="width:100%;margin-top:8px;font-weight:900">凸 デコを記録</button><div class="note" style="margin-top:5px;text-align:center">釣果なしの日も、天候・水温・水色・水位・風・気圧を分析データとして残せます。</div></section>
+<div class="full"><label>タックルセット</label><select id="tackleSet"><option value="">個別選択</option></select></div><div><label>ロッド</label><select id="rod"><option></option></select></div><div><label>リール</label><select id="reel"><option></option></select></div><div><label>ライン</label><select id="lineType"><option></option><option>フロロ</option><option>ナイロン</option><option>カーボナイロン</option><option>PE</option></select></div><div><label id="lineSizeLabel">lb</label><select id="lineLb"><option value=""></option></select></div><div><label>ルアー</label><input id="lure"></div><div><label>カラー</label><input id="color"></div><div><label>リグ</label><select id="rig"><option></option><option>ノーシンカー</option><option>ネコリグ</option><option>ダウンショット</option><option>テキサスリグ</option><option>フリーリグ</option><option>キャロライナリグ</option><option>ライトキャロ</option><option>ジカリグ</option><option>リーダーレスダウンショット</option><option>スプリットショット</option><option>ワッキーリグ</option><option>ジグヘッドリグ</option><option>ミドスト</option><option>ホバスト</option><option>モリケンリグ</option><option>ラバージグ</option><option>チャターベイト</option><option>スイムジグ</option><option>その他</option></select></div><div><label>シンカー重量</label><select id="sinkerWeight"><option></option><option>なし</option><option>0.3g</option><option>0.45g</option><option>0.6g</option><option>0.9g</option><option>1.3g</option><option>1.8g</option><option>2.2g</option><option>2.7g</option><option>3.5g</option><option>5g</option><option>7g</option><option>9g</option><option>10g</option><option>11g</option><option>14g</option><option>18g</option><option>21g</option><option>28g</option><option>その他</option></select></div><div><label>レンジ</label><input id="range"></div><div><label>釣り方</label><input id="method"></div><div class="full"><label>シチュエーション</label><textarea id="situation"></textarea></div></div></div><button id="saveCatch" class="btn pri" style="width:100%">この釣果を保存</button></section>
 
 <section id="measure" style="display:none">
 <button id="backEntry" class="btn sec">← 登録</button>
@@ -974,7 +972,7 @@ Chromeのメニューから「アプリをインストール」でも追加で�
 <nav class="nav"><button data-v="home" class="active"><b>🏠</b>ホーム</button><button data-v="trip"><b>🚤</b>釣行</button><button id="homeQuickCameraBtn" type="button" aria-label="すぐ撮影"><b>📸</b>撮影</button><button data-v="entry"><b>➕</b>釣果</button><button data-v="all"><b>🎣</b>一覧</button><button data-v="tackle"><b>🧰</b>タックル</button></nav>
 <script>
 const $=id=>document.getElementById(id);
-const RKEY='basslog_records_v2', DECO_KEY='basslog_deco_v1', TKEY='basslog_tackle_v6', TRIPKEY='basslog_active_trip_v1', HOMEKEY='basslog_home_v1';
+const RKEY='basslog_records_v2', TKEY='basslog_tackle_v6', TRIPKEY='basslog_active_trip_v1', HOMEKEY='basslog_home_v1';
 const MEDIA_DB='basslog_media_v1', MEDIA_STORE='catch_media';
 let mediaDBPromise=null;
 function openMediaDB(){
@@ -1086,9 +1084,17 @@ function fillLineSize(type,selectId,labelId,keep){
   let lab=$(labelId);if(lab)lab.textContent=type==='PE'?'号数':'lb';
 }
 function lineText(type,size){return (type||'')+(size?' '+size+lineUnit(type):'')}
-const places=['高滝湖','亀山湖','片倉ダム','戸面原ダム','将監川','長門川','野池','溜池','非公開','その他'];
+const prefectures=['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+const rentalSpotsByPrefecture={
+ '千葉県':['高滝湖','亀山湖','片倉ダム','戸面原ダム','三島湖','豊英湖','将監川','長門川']
+};
+const genericPublicPlaces=['野池','溜池','非公開','その他'];
+const places=[...(rentalSpotsByPrefecture['千葉県']||[]),...genericPublicPlaces];
+function prefectureForPlace(place){for(const [pref,spots] of Object.entries(rentalSpotsByPrefecture))if(spots.includes(place))return pref;return '千葉県'}
+function fillPrefectureSelect(id,value='千葉県'){const el=$(id);if(!el)return;el.innerHTML=prefectures.map(p=>`<option value="${p}">${p}</option>`).join('');el.value=prefectures.includes(value)?value:'千葉県'}
+function fillPublicPlaceSelect(id,pref,value='',allowBlank=false){const el=$(id);if(!el)return;const spots=rentalSpotsByPrefecture[pref]||[];const opts=[...spots,...genericPublicPlaces];el.innerHTML=(allowBlank?'<option value=""></option>':'')+opts.map(p=>`<option value="${p}">${p}</option>`).join('');if(value&&opts.includes(value))el.value=value;else if(allowBlank)el.value='';else el.value=opts[0]||'その他'}
+function setupPlaceSelectors(){fillPrefectureSelect('publicPrefecture');fillPublicPlaceSelect('publicPlace','千葉県','高滝湖');fillPrefectureSelect('entryPrefecture');fillPublicPlaceSelect('entryPublicPlace','千葉県','',true);$('publicPrefecture').onchange=()=>fillPublicPlaceSelect('publicPlace',$('publicPrefecture').value);$('entryPrefecture').onchange=()=>fillPublicPlaceSelect('entryPublicPlace',$('entryPrefecture').value,'',true)}
 const getR=()=>{try{return JSON.parse(localStorage.getItem(RKEY)||'[]')}catch{return[]}}, setR=v=>localStorage.setItem(RKEY,JSON.stringify(v));
-const getDeco=()=>{try{const a=JSON.parse(localStorage.getItem(DECO_KEY)||'[]');return Array.isArray(a)?a:[]}catch{return[]}},setDeco=v=>localStorage.setItem(DECO_KEY,JSON.stringify(v));
 function getT(){try{let t=JSON.parse(localStorage.getItem(TKEY)||'null');if(t)return t;let old=JSON.parse(localStorage.getItem('basslog_tackle_v1')||'null')||JSON.parse(localStorage.getItem('basslog_tackle_v2')||'null');if(old){let n={rods:old.rods||[],reels:old.reels||[],sets:old.sets||[]};localStorage.setItem(TKEY,JSON.stringify(n));return n}}catch{}return{rods:[],reels:[],sets:[]}}
 const setT=v=>localStorage.setItem(TKEY,JSON.stringify(v));
 const getTrip=()=>{try{return JSON.parse(localStorage.getItem(TRIPKEY)||'null')}catch{return null}},setTrip=v=>v?localStorage.setItem(TRIPKEY,JSON.stringify(v)):localStorage.removeItem(TRIPKEY);
@@ -1136,7 +1142,7 @@ function applyHomeCardOrder(){const box=document.querySelector('.homeMaxCards');
 window.addEventListener('basslog-home-card-order-change',()=>{applyHomeCardOrder();scheduleHomeFit()});
 function renderHome(){updateHomeAILearnCount();let all=getR(),now=new Date(),y=now.getFullYear(),mo=now.getMonth(),month=all.filter(r=>{let d=new Date(r.date+'T00:00:00');return d.getFullYear()===y&&d.getMonth()===mo}),year=all.filter(r=>new Date(r.date+'T00:00:00').getFullYear()===y);$('maxMonth').innerHTML=maxCardHTML('今月最大',maxCatch(month));$('maxYear').innerHTML=maxCardHTML('今年最大',maxCatch(year));$('maxAll').innerHTML=maxCardHTML('歴代最大',maxCatch(all));applyHomeCardOrder();renderCalendar();let trip=getTrip();if(trip){$('tripBanner').style.display='block';$('tripBanner').innerHTML=`<b>🚤 今日の釣行：${esc(trip.publicPlace)}</b><div class="muted">${esc(trip.date)} / ${esc(trip.ride||'')}</div><div class="tripTackles">${(trip.setNames||[]).map(x=>`<span class="chip">${esc(x)}</span>`).join('')}</div>`}else $('tripBanner').style.display='none';scheduleHomeFit()}
 function renderHero(){}
-function renderCalendar(){let y=cur.getFullYear(),m=cur.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),all=getR(),decos=getDeco(),today=new Date();$('mt').textContent=`${y}年 ${m+1}月`;let h='';for(let i=0;i<first;i++)h+='<div class="day empty"></div>';for(let d=1;d<=days;d++){let ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,a=all.filter(x=>x.date===ds),deco=decos.find(x=>x.date===ds),p=catchPhoto(a.find(x=>catchPhoto(x))),td=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;h+=`<button class="day ${a.length?'has':deco?'deco':''} ${td?'today':''}" data-date="${ds}"><div class="num">${d}</div>${a.length?`<div class="cnt">🎣 ${a.length}本</div>${p?`<img class="mini" src="${p}">`:''}`:deco?`<div class="cnt decoMark">凸</div>`:''}</button>`}$('cal').innerHTML=h;document.querySelectorAll('.day[data-date]').forEach(b=>b.onclick=()=>openDay(b.dataset.date))}
+function renderCalendar(){let y=cur.getFullYear(),m=cur.getMonth(),first=new Date(y,m,1).getDay(),days=new Date(y,m+1,0).getDate(),all=getR(),today=new Date();$('mt').textContent=`${y}年 ${m+1}月`;let h='';for(let i=0;i<first;i++)h+='<div class="day empty"></div>';for(let d=1;d<=days;d++){let ds=`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`,a=all.filter(x=>x.date===ds),p=catchPhoto(a.find(x=>catchPhoto(x))),td=today.getFullYear()===y&&today.getMonth()===m&&today.getDate()===d;h+=`<button class="day ${a.length?'has':''} ${td?'today':''}" data-date="${ds}"><div class="num">${d}</div>${a.length?`<div class="cnt">🎣 ${a.length}本</div>${p?`<img class="mini" src="${p}">`:''}`:''}</button>`}$('cal').innerHTML=h;document.querySelectorAll('.day[data-date]').forEach(b=>b.onclick=()=>openDay(b.dataset.date))}
 function changeCalendarMonth(delta){
   const d=cur.getDate();
   cur.setDate(1);
@@ -1248,22 +1254,13 @@ function buildDayAnalysis(a){
   if(lines.length<=1)return `${lines.join('')}共通するパターンはまだ弱く、次回の釣果と比較したい日。`;
   return `${lines.join('')}この条件とアプローチが、この日の再現性が高いパターン。`;
 }
-function openDay(date){
-  selectedDate=date;
-  let a=getR().filter(x=>x.date===date),deco=getDeco().find(x=>x.date===date)||null;
-  $('dt').textContent=date.replaceAll('-','/');
-  const source=a.length?a:(deco?[deco]:[]),pub=source[0]?.publicPlace||source[0]?.place||'-';
-  const sizes=a.map(x=>Number(x.size)).filter(Number.isFinite),maxSize=sizes.length?Math.max(...sizes)+'cm':'-';
-  const weather=daySummaryValue(source,'weather'),air=daySummaryValue(source,'airTemp','℃'),water=daySummaryValue(source,'waterTemp','℃'),waterColor=daySummaryValue(source,'waterColor'),windDir=daySummaryValue(source,'windDir'),windSpeed=daySummaryValue(source,'windSpeed','m/s'),pressure=daySummaryValue(source,'pressure','hPa'),waterLevel=source.length?detailWaterLevel(source[0]):'';
-  const cond=[weather,air?`気温 ${air}`:'',water?`水温 ${water}`:'',waterColor?`水色 ${waterColor}`:'',waterLevel?`水位 ${waterLevel}`:''].filter(Boolean);
-  const env=[windDir||windSpeed?`風 ${[windDir,windSpeed].filter(Boolean).join(' ')}`:'',pressure?`気圧 ${pressure}`:''].filter(Boolean);
-  const resultLine=a.length?`${a.length}本 / 最大 ${maxSize}`:(deco?'凸 / 釣果なし':'釣果記録なし');
-  $('daySummary').innerHTML=`<b>📍 ${esc(pub)}</b><div class="muted">${resultLine}</div>${cond.length?`<div style="margin-top:5px;color:#17351f;font-weight:700">🌤 ${cond.map(esc).join(' / ')}</div>`:''}${env.length?`<div style="margin-top:2px;color:#17351f">${env.map(esc).join(' / ')}</div>`:''}${a.length&&buildDayAnalysis(a)?`<div style="margin-top:7px;padding-top:6px;border-top:1px solid rgba(16,43,32,.18);color:#102b20;line-height:1.45"><b>🧠 総評</b> ${esc(buildDayAnalysis(a))}</div>`:deco?`<div style="margin-top:7px;padding-top:6px;border-top:1px solid rgba(16,43,32,.18);color:#102b20;line-height:1.45"><b>🧠 凸データ</b> 釣れなかった日のコンディションとして保存。今後の比較分析に使用します。</div>`:''}`;
-  $('gal').innerHTML=a.length?a.map(x=>`<button class="g" data-id="${x.id}">${catchPhoto(x)?`<img src="${catchPhoto(x)}">`:`<div class="ph">🎣</div>`}<div class="cap"><b>${x.size?x.size+'cm':'サイズ未入力'}</b><div class="muted">${esc(x.lure||'')}</div></div></button>`).join(''):deco?'<div class="card" style="text-align:center;font-weight:900;font-size:20px">凸　NO FISH</div>':'<div class="card">この日の釣果はありません</div>';
-  document.querySelectorAll('.g').forEach(b=>b.onclick=()=>openDetail(+b.dataset.id));
-  $('daySNS').style.display=a.length?'block':'none';
-  $('deleteDeco').style.display=deco&&!a.length?'block':'none';
-  show('day');
+function openDay(date){selectedDate=date;let a=getR().filter(x=>x.date===date);$('dt').textContent=date.replaceAll('-','/');let pub=a[0]?.publicPlace||a[0]?.place||'-';const sizes=a.map(x=>Number(x.size)).filter(Number.isFinite),maxSize=sizes.length?Math.max(...sizes)+'cm':'-';const weather=daySummaryValue(a,'weather'),air=daySummaryValue(a,'airTemp','℃'),water=daySummaryValue(a,'waterTemp','℃'),waterColor=daySummaryValue(a,'waterColor'),windDir=daySummaryValue(a,'windDir'),windSpeed=daySummaryValue(a,'windSpeed','m/s'),pressure=daySummaryValue(a,'pressure','hPa'),waterLevel=a.length?detailWaterLevel(a[0]):'';const cond=[weather,air?`気温 ${air}`:'',water?`水温 ${water}`:'',waterColor?`水色 ${waterColor}`:'',waterLevel?`水位 ${waterLevel}`:''].filter(Boolean);const env=[windDir||windSpeed?`風 ${[windDir,windSpeed].filter(Boolean).join(' ')}`:'',pressure?`気圧 ${pressure}`:''].filter(Boolean);$('daySummary').innerHTML=`<b>📍 ${esc(pub)}</b><div class="muted">${a.length}本 / 最大 ${maxSize}</div>${cond.length?`<div style="margin-top:5px;color:#17351f;font-weight:700">🌤 ${cond.map(esc).join(' / ')}</div>`:''}${env.length?`<div style="margin-top:2px;color:#17351f">${env.map(esc).join(' / ')}</div>`:''}${buildDayAnalysis(a)?`<div style="margin-top:7px;padding-top:6px;border-top:1px solid rgba(16,43,32,.18);color:#102b20;line-height:1.45"><b>🧠 総評</b> ${esc(buildDayAnalysis(a))}</div>`:''}`;$('gal').innerHTML=a.length?a.map(x=>`<button class="g" data-id="${x.id}">${catchPhoto(x)?`<img src="${catchPhoto(x)}">`:`<div class="ph">🎣</div>`}<div class="cap"><b>${x.size?x.size+'cm':'サイズ未入力'}</b><div class="muted">${esc(x.lure||'')}</div></div></button>`).join(''):'<div class="card">この日の釣果はありません</div>';document.querySelectorAll('.g').forEach(b=>b.onclick=()=>openDetail(+b.dataset.id));show('day')}
+function detailWaterLevel(x){
+  if(x?.waterLevel===''||x?.waterLevel===null||x?.waterLevel===undefined)return '';
+  const n=Number(x.waterLevel);
+  if(!Number.isFinite(n))return String(x.waterLevel||'');
+  if(n===0)return '満水';
+  return `−${n.toFixed(1).replace(/\.0$/,'')}m`;
 }
 function detailWaterColor(x){
   const current=String(x?.waterColor||'').trim();
@@ -1311,10 +1308,10 @@ async function openDetail(id){
 }
 $('backCal').onclick=()=>show('home');$('backDay').onclick=()=>openDay(selectedDate);
 
-function renderTrip(){let t=getT(),trip=getTrip();$('tripDate').value=trip?.date||new Date().toISOString().slice(0,10);$('publicPlace').value=trip?.publicPlace||'高滝湖';$('privatePlace').value=trip?.privatePlace||'';$('tripRide').value=trip?.ride||'フローター';$('todaySetList').innerHTML=t.sets.length?t.sets.map((s,i)=>`<label class="checkrow"><input type="checkbox" class="todaySet" value="${i}" ${(trip?.setIndexes||[]).includes(i)?'checked':''}><span><b>${esc(s.name)}</b><br><span class="muted">${esc(s.rod)} / ${esc(s.reel)} / ${esc(s.type)} ${s.lb}lb</span></span></label>`).join(''):'<div class="note">先に「タックル」でセットを登録してね。</div>'}
-$('saveTrip').onclick=()=>{let t=getT(),idx=[...document.querySelectorAll('.todaySet:checked')].map(x=>+x.value),trip={date:$('tripDate').value,publicPlace:$('publicPlace').value,privatePlace:$('privatePlace').value.trim(),ride:$('tripRide').value,setIndexes:idx,setNames:idx.map(i=>t.sets[i]?.name).filter(Boolean)};setTrip(trip);rememberPlace(trip.privatePlace);alert('今日の釣行を保存したよ 🚤');show('home')};$('endTrip').onclick=()=>{if(confirm('今日の釣行設定を終了する？')){setTrip(null);show('home')}};
+function renderTrip(){let t=getT(),trip=getTrip();$('tripDate').value=trip?.date||new Date().toISOString().slice(0,10);let pref=trip?.prefecture||prefectureForPlace(trip?.publicPlace||'高滝湖');fillPrefectureSelect('publicPrefecture',pref);fillPublicPlaceSelect('publicPlace',pref,trip?.publicPlace||'高滝湖');$('privatePlace').value=trip?.privatePlace||'';$('tripRide').value=trip?.ride||'フローター';$('todaySetList').innerHTML=t.sets.length?t.sets.map((s,i)=>`<label class="checkrow"><input type="checkbox" class="todaySet" value="${i}" ${(trip?.setIndexes||[]).includes(i)?'checked':''}><span><b>${esc(s.name)}</b><br><span class="muted">${esc(s.rod)} / ${esc(s.reel)} / ${esc(s.type)} ${s.lb}lb</span></span></label>`).join(''):'<div class="note">先に「タックル」でセットを登録してね。</div>'}
+$('saveTrip').onclick=()=>{let t=getT(),idx=[...document.querySelectorAll('.todaySet:checked')].map(x=>+x.value),trip={date:$('tripDate').value,prefecture:$('publicPrefecture').value,publicPlace:$('publicPlace').value,privatePlace:$('privatePlace').value.trim(),ride:$('tripRide').value,setIndexes:idx,setNames:idx.map(i=>t.sets[i]?.name).filter(Boolean)};setTrip(trip);rememberPlace(trip.privatePlace);alert('今日の釣行を保存したよ 🚤');show('home')};$('endTrip').onclick=()=>{if(confirm('今日の釣行設定を終了する？')){setTrip(null);show('home')}};
 
-function prepEntry(){let trip=getTrip(),t=getT();$('date').value=trip?.date||new Date().toISOString().slice(0,10);updateAutoTide();$('entryPublicPlace').value='';$('place').value=trip?.privatePlace||'';$('ride').value=trip?.ride||'';$('weather').value='';updateAutoTide();$('windDir').value='';$('windSpeed').value='';$('entryTripInfo').style.display=trip?'block':'none';if(trip)$('entryTripInfo').innerHTML=`<b>🚤 ${esc(trip.publicPlace)}</b><div class="muted">今日の釣行設定を自動入力中</div>`;let sets=trip?.setIndexes?.length?trip.setIndexes.map(i=>({i,s:t.sets[i]})).filter(x=>x.s):t.sets.map((s,i)=>({i,s}));$('tackleSet').innerHTML='<option value="">個別選択</option>'+sets.map(x=>`<option value="${x.i}">${esc(x.s.name)}</option>`).join('');$('rod').innerHTML='<option></option>'+t.rods.map(x=>`<option>${esc(x)}</option>`).join('');$('reel').innerHTML='<option></option>'+t.reels.map(x=>`<option>${esc(x)}</option>`).join('');refreshPlaceDatalist();updatePlaceWaterHint()}
+function prepEntry(){let trip=getTrip(),t=getT();$('date').value=trip?.date||new Date().toISOString().slice(0,10);updateAutoTide();let pref=trip?.prefecture||prefectureForPlace(trip?.publicPlace||'');fillPrefectureSelect('entryPrefecture',pref);fillPublicPlaceSelect('entryPublicPlace',pref,trip?.publicPlace||'',true);$('place').value=trip?.privatePlace||'';$('ride').value=trip?.ride||'';$('weather').value='';updateAutoTide();$('windDir').value='';$('windSpeed').value='';$('entryTripInfo').style.display=trip?'block':'none';if(trip)$('entryTripInfo').innerHTML=`<b>🚤 ${esc(trip.publicPlace)}</b><div class="muted">今日の釣行設定を自動入力中</div>`;let sets=trip?.setIndexes?.length?trip.setIndexes.map(i=>({i,s:t.sets[i]})).filter(x=>x.s):t.sets.map((s,i)=>({i,s}));$('tackleSet').innerHTML='<option value="">個別選択</option>'+sets.map(x=>`<option value="${x.i}">${esc(x.s.name)}</option>`).join('');$('rod').innerHTML='<option></option>'+t.rods.map(x=>`<option>${esc(x)}</option>`).join('');$('reel').innerHTML='<option></option>'+t.reels.map(x=>`<option>${esc(x)}</option>`).join('');refreshPlaceDatalist();updatePlaceWaterHint()}
 
 
 function valOf(id, fallback=''){let e=$(id);return e?e.value:fallback}
@@ -1323,7 +1320,7 @@ function setValIf(id,v){let e=$(id);if(e)e.value=(v??'')}
 
 function speedLabel(v){return ({'1':'極遅','2':'遅い','3':'普通','4':'速い','5':'極速'})[String(v)]||''}
 
-const ENTRY_IDS=['date','catchTime','entryPublicPlace','place','size','waterTemp','waterColor','waterLevel','airTemp','pressure','weather','tide','windDir','windSpeed','ride','tackleSet','rod','reel','lineType','lineLb','lure','color','rig','sinkerWeight','range','method','retrieveSpeed','fallSpeed','situation'];
+const ENTRY_IDS=['date','catchTime','entryPrefecture','entryPublicPlace','place','size','waterTemp','waterColor','waterLevel','airTemp','pressure','weather','tide','windDir','windSpeed','ride','tackleSet','rod','reel','lineType','lineLb','lure','color','rig','sinkerWeight','range','method','retrieveSpeed','fallSpeed','situation'];
 function captureEntryDraft(){
   const d={};
   ENTRY_IDS.forEach(id=>{const e=$(id);if(e)d[id]=e.value});
@@ -1343,7 +1340,7 @@ async function fillEntryFromCatch(x){
   editingCatchId=x.id;
   $('editBanner').style.display='block';$('cancelEdit').style.display='inline-block';
   $('entryTripInfo').style.display='none';
-  setValIf('date',x.date||'');setValIf('entryPublicPlace',x.publicPlace||x.place||'高滝湖');
+  setValIf('date',x.date||'');{let pref=x.prefecture||prefectureForPlace(x.publicPlace||x.place||'');fillPrefectureSelect('entryPrefecture',pref);fillPublicPlaceSelect('entryPublicPlace',pref,x.publicPlace||x.place||'',true)};
   setValIf('place',x.privatePlace||x.place||'');setValIf('size',x.size??'');setValIf('catchTime',x.catchTime||'');setValIf('waterTemp',x.waterTemp??'');setValIf('waterColor',x.waterColor||'');setValIf('waterLevel',x.waterLevel||'');setValIf('airTemp',x.airTemp??'');setValIf('pressure',x.pressure??'');
   setValIf('weather',x.weather||'');setValIf('tide',x.tide||bassTideFromDate(x.date||''));setValIf('windDir',x.windDir||'');setValIf('windSpeed',x.windSpeed??'');setValIf('ride',x.ride||'');
   setValIf('rod',x.rod||x.tackle||'');setValIf('reel',x.reel||'');setValIf('lineType',x.lineType||'');fillLineSize(x.lineType||'','lineLb','lineSizeLabel',x.lineLb??'');setValIf('lure',x.lure||'');setValIf('color',x.color||'');setValIf('rig',x.rig||'');setValIf('sinkerWeight',x.sinkerWeight||'');
@@ -1428,31 +1425,18 @@ $('lineType').onchange=()=>fillLineSize($('lineType').value,'lineLb','lineSizeLa
 $('newSetLineType').onchange=()=>fillLineSize($('newSetLineType').value,'newSetLb','newSetSizeLabel','');
 fillLineSize($('lineType').value,'lineLb','lineSizeLabel',$('lineLb').value);
 fillLineSize($('newSetLineType').value,'newSetLb','newSetSizeLabel',$('newSetLb').value);
-$('saveDeco').onclick=()=>{
-  const date=valOf('date','');
-  if(!date){alert('日付を入れてね');return}
-  if(getR().some(x=>x.date===date)){alert('この日は釣果が登録されています。凸記録は不要です。');return}
-  const publicPlace=valOf('entryPublicPlace',valOf('place','')),privatePlace=valOf('place','').trim();
-  if(!confirm(`${date.replaceAll('-','/')} を「凸（釣果なし）」として記録する？`))return;
-  rememberPlace(privatePlace);
-  const x={id:Date.now(),date,publicPlace,privatePlace,place:privatePlace||publicPlace,weather:valOf('weather',''),tide:(bassTideFromDate(date)||valOf('tide','')),windDir:valOf('windDir',''),windSpeed:valOf('windSpeed',''),ride:valOf('ride',''),waterTemp:numOf('waterTemp'),waterColor:valOf('waterColor',''),waterLevel:numOf('waterLevel'),airTemp:numOf('airTemp'),pressure:numOf('pressure'),situation:valOf('situation','').trim()};
-  let d=getDeco().filter(v=>v.date!==date);d.push(x);setDeco(d);renderHome();show('home');
-};
-$('deleteDeco').onclick=()=>{
-  if(!selectedDate)return;
-  if(!confirm(`${selectedDate.replaceAll('-','/')} の凸記録を削除する？`))return;
-  setDeco(getDeco().filter(x=>x.date!==selectedDate));renderHome();show('home');
-};
 $('saveCatch').onclick=async()=>{
  let newMediaKey='';
  try{
    const publicPlace=valOf('entryPublicPlace',valOf('place',''));
+   const prefecture=valOf('entryPrefecture',prefectureForPlace(publicPlace));
    const privatePlace=valOf('place','').trim();
    rememberPlace(privatePlace);
    let x={
      id:editingCatchId||Date.now(),
      date:valOf('date',''),catchTime:valOf('catchTime',''),
      publicPlace,
+     prefecture,
      privatePlace,
      place:privatePlace||publicPlace,
      size:numOf('size'),
@@ -1477,7 +1461,6 @@ $('saveCatch').onclick=async()=>{
      fallSpeed:valOf('fallSpeed',''),
      situation:valOf('situation','').trim()
    };   if(!x.date){alert('日付を入れてね');return}
-   setDeco(getDeco().filter(d=>d.date!==x.date));
    let a=getR(),wasEdit=!!editingCatchId;
    let oldRecord=wasEdit?a.find(r=>r.id===editingCatchId):null;
    let oldMediaKey=oldRecord?.mediaKey||'';
@@ -1862,7 +1845,7 @@ function renderAll(){let q=$('search').value.toLowerCase(),a=getR().filter(x=>Ob
 
 const BASSLOG_WEATHER_PLACE_MASTER={
 '高滝湖':[35.349,140.157],'亀山湖':[35.205,140.093],'片倉ダム':[35.228,140.087],
-'笹川湖':[35.228,140.087],'戸面原ダム':[35.183,139.935],'戸面原':[35.183,139.935],
+'笹川湖':[35.228,140.087],'戸面原ダム':[35.183,139.935],'戸面原':[35.183,139.935],'三島湖':[35.184,140.019],'三島ダム':[35.184,140.019],'豊英湖':[35.158,140.086],'豊英ダム':[35.158,140.086],
 '将監川':[35.874,140.193],'長門川':[35.835,140.232]};
 function bassLogResolveWeatherPlace(r){
  const vals=[r.place,r.publicPlace,r.location,r.spot].filter(Boolean).map(String);
@@ -2474,7 +2457,7 @@ function installBackGuard(){
   });
 }
 
-async function startBassLog(){updateAIOptionUI();
+async function startBassLog(){setupPlaceSelectors();updateAIOptionUI();
   document.querySelector('.wrap')?.classList.add('homeMode');
   installBackGuard();
   await migrateLegacyMedia();
